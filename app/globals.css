@@ -1,0 +1,568 @@
+/* 由 notion-首页原型-index.html 原样迁移(M1)。
+   唯一改动:--display 改用 next/font 注入的字体变量,字体自托管,不再请求 Google Fonts。 */
+
+  /* 平台发布时注入的基础重置，离线打开也要有 */
+  :root{color-scheme:light;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);}
+  html,body{margin:0}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+
+/* ============================================================
+   与英文版同一套骨架；改动全部集中在中文排版的三处：
+   字号（中文字面率高，52 → 46）、行高（1.12 → 1.38）、
+   竖排方向（自下而上侧倒 → 自上而下直立）。
+   ============================================================ */
+:root{
+  --ground:#f6f6f6;
+  --ink:#000000;
+  --paper:#ffffff;
+  --accent:#ff5959;
+  --lime:#b3ff60;
+  --ink-60:#6e6e6e;
+  --paper-70:#b1b1b1;
+  --hair-dark:rgba(0,0,0,.14);
+  --hair-light:rgba(255,255,255,.18);
+
+  --rail:81px;
+  --inset-r:20px;
+  --inset-t:24px;
+  --gut:calc(7.2vw - 13.92px);
+  --colgap:24px;
+  --pad-y:135px;
+
+  /* 拉丁字形走 Hanken，汉字回落到思源黑体：
+     年份和数字才不会被中文字体的全角数字拖垮 */
+  --display:var(--font-hanken),var(--font-noto-sc),'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+}
+
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--display);
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+}
+html{scroll-behavior:smooth}
+*{box-sizing:border-box}
+h1,h2,h3,h4,p,figure,ul{margin:0}
+ul{padding:0;list-style:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* ============ 书脊 ============ */
+.rail{
+  position:fixed;top:0;left:0;
+  width:var(--rail);height:100%;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  background:transparent;z-index:110;
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;
+}
+.rail-mark{margin-top:150px;pointer-events:auto;opacity:0;transition:opacity .4s ease}
+.rail-mark.on{opacity:1}
+.rail-mark svg{display:block;width:46px;height:46px}
+.rail-label{flex:1;display:flex;align-items:center;justify-content:center}
+/* 中文竖排：字形直立、自上而下。英文版的 rotate(180deg) 在这里
+   会把汉字倒过来，必须去掉。字距也要比拉丁大得多才看得出节奏。 */
+.rail-label span{
+  writing-mode:vertical-rl;
+  text-orientation:upright;
+  font-size:14px;
+  font-weight:500;
+  letter-spacing:.5em;
+  white-space:nowrap;
+  transition:opacity .4s ease;
+}
+.rail-label.swapping span{opacity:0}
+.rail-menu{
+  margin-bottom:38px;width:24px;height:20px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  pointer-events:auto;
+}
+
+
+/* ============================================================
+   汉堡 → X：整组旋转 -45°，底条上移并消失，中条自转 -90° 成竖线。
+   实测 union 用 .3s / .22s 两档，中条比外组快一点。
+   ============================================================ */
+.burger{display:block;fill:currentColor;clip-path:inset(0);transition:clip-path .4s ease-out}
+.burger.wipe{clip-path:inset(0 0 100% 0)}
+.burger g,.burger path{transform-box:fill-box;transform-origin:center}
+.burger g{transition:transform .3s ease}
+.burger path{transition:transform .3s ease,opacity .3s ease}
+.burger .b3{transition:transform .22s ease}
+.is-open .burger g{transform:rotate(-45deg)}
+.is-open .burger .b1{transform:translateY(-12px);opacity:0}
+.is-open .burger .b2{transform:translateY(3px)}
+.is-open .burger .b3{transform:rotate(-90deg)}
+
+/* ============================================================
+   抽屉：616px 宽，从书脊右缘滑出，0.75s ease。
+   背景切换是 0s——先瞬间变黑，再滑进来；关闭时同理，
+   所以内容是"随着板子滑走而消失"，不是淡出。
+   菜单项沿用作品卡的逻辑：静止只有大标题，
+   hover 才把箭头（从左滑入）和说明文字一起长出来。
+   ============================================================ */
+.backdrop{position:fixed;inset:0;z-index:1;background:transparent;display:none}
+.backdrop.on{display:block}
+.drawer{
+  position:fixed;top:0;left:var(--rail);
+  width:616px;max-width:calc(100vw - var(--rail));
+  height:100%;z-index:2;
+  padding:calc(env(safe-area-inset-top,0px) + 150px) 56px
+          calc(env(safe-area-inset-bottom,0px) + 44px) 114px;
+  background:var(--ground);
+  transform:translateX(-616px);
+  transition:background 0s,transform .75s ease;
+  overflow-y:auto;
+  display:flex;flex-direction:column;justify-content:center;gap:52px;
+}
+.drawer.open{
+  background:var(--ink);
+  transform:translateX(0);
+  transition:transform .75s ease;
+}
+.nav-primary{display:flex;flex-direction:column;gap:34px}
+.nav-item{display:block;text-decoration:none}
+.nav-item h2{
+  display:flex;align-items:center;gap:18px;
+  color:#e5e5e5;transition:color .75s ease;   /* 颜色过渡整整 0.75 秒 */
+}
+.nav-item:hover h2,.nav-item:focus-visible h2{color:#fff}
+.nav-item .arrow{
+  width:43px;height:18px;opacity:0;
+  transform:translateX(-15px);
+  transition:opacity .2s ease,transform .2s ease;
+}
+.nav-item .arrow::before{width:43px}
+.nav-item .arrow::after{width:18px;height:18px}
+.nav-item:hover .arrow,.nav-item:focus-visible .arrow{opacity:1;transform:translateX(0)}
+.nav-item p{
+  margin-top:12px;font-size:16px;color:#b1b1b1;
+  opacity:0;transition:opacity .2s ease;
+}
+.nav-item:hover p,.nav-item:focus-visible p{opacity:1}
+.nav-secondary{
+  display:flex;flex-wrap:wrap;gap:14px 28px;
+  border-top:1px solid var(--hair-light);padding-top:28px;
+}
+.nav-secondary a{font-size:16px;color:#b1b1b1;transition:color .2s ease}
+.nav-secondary a:hover,.nav-secondary a:focus{color:var(--accent)}
+.nav-item h2{font-size:42px;font-weight:300;line-height:1.3;letter-spacing:.02em}
+
+/* ============ 石板 ============ */
+.stage{
+  margin-left:var(--rail);margin-right:var(--inset-r);
+  padding-top:var(--inset-t);
+  display:flex;flex-direction:column;gap:24px;
+}
+/* z-index:0 —— 让每块石板成为自己的层叠上下文。
+   没有这一行，石板内部的 z-index（轮播控件、作品卡遮罩层）
+   会跑到根层级去和抽屉(z:2)比大小，抽屉打开时内容就会穿透压在上面。 */
+.slab{padding:var(--pad-y) 0;position:relative;z-index:0}
+.slab.dark{background:var(--ink);color:var(--paper)}
+.slab.paper{background:var(--paper);color:var(--ink)}
+.slab.ground{background:var(--ground);color:var(--ink);padding:50px 0}
+.slab.flush{padding:0;background:transparent}
+
+.grid{
+  display:grid;
+  grid-template-columns:var(--gut) repeat(10,1fr) var(--gut);
+  column-gap:var(--colgap);
+}
+.c-head{grid-column:2 / 7}
+.c-aside{grid-column:8 / 12}
+.c-left{grid-column:2 / 6}
+.c-rows{grid-column:7 / 12}
+
+/* ============ 中文字阶 ============
+   46px 而不是 52px：汉字字面率约为拉丁的 1.2 倍，
+   同字号下中文看起来明显更大更重。 */
+.eyebrow{font-size:17px;line-height:1.7;font-weight:400;letter-spacing:.06em}
+.display{
+  font-size:clamp(28px, calc(2.2vw + 10.32px), 46px);
+  font-weight:300;
+  line-height:1.38;          /* 拉丁 1.12 在中文下会糊成一块 */
+  letter-spacing:.02em;      /* 中文要正字距，拉丁那边是负的 */
+}
+.display-sm{
+  font-size:clamp(21px, calc(0.6vw + 15.36px), 24px);
+  font-weight:400;line-height:1.5;letter-spacing:.01em;
+}
+.lede{
+  font-size:17px;line-height:1.9;   /* 拉丁 1.6 → 中文 1.9 */
+  max-width:34em;
+}
+.dark .lede{color:#e8e8e8}          /* 黑底上不用纯白，减轻光晕 */
+.small{font-size:15px;line-height:1.8;color:var(--ink-60)}
+.dark .small{color:var(--paper-70)}
+.stack{display:flex;flex-direction:column;gap:30px;align-items:flex-start}
+.num{font-variant-numeric:tabular-nums}
+/* 中文标题靠手动断行控节奏，窄屏下必须让它失效 */
+br.pc{display:inline}
+
+
+/* ============================================================
+   箭头：::before 是 3px 粗的横杆，::after 是 45° 旋转的方角＝箭头头。
+   hover 时杆变长、头前探，整体像被拉长，而不是整体平移。
+   ============================================================ */
+.arrow{
+  position:relative;display:inline-block;flex:none;
+  width:30px;height:15px;color:currentColor;vertical-align:middle;
+  transition:opacity .2s ease,transform .2s ease;
+}
+.arrow::before{
+  content:'';position:absolute;left:0;top:50%;
+  width:30px;border-bottom:3px solid currentColor;
+  transition:width .2s ease;
+}
+.arrow::after{
+  content:'';position:absolute;right:1px;top:50%;
+  width:15px;height:15px;
+  border-right:3px solid currentColor;border-top:3px solid currentColor;
+  transform:translate(0,-50%) rotate(45deg);
+  transition:transform .2s ease;
+}
+/* 正文内链用小一号的箭头，幅度也小一档 */
+.arrow.sm{width:21px;height:11px}
+.arrow.sm::before{width:12px}
+.arrow.sm::after{width:11px;height:11px;border-width:2px}
+
+/* ============================================================
+   下划线：从左端 scaleX 展开，330ms；离文字 10px，比文字宽 10px。
+   focus 与 hover 同等对待——键盘走到这里，下划线一样展开。
+   ============================================================ */
+.ulink{
+  position:relative;display:inline-block;
+  color:var(--accent);font-weight:600;line-height:1;text-decoration:none;
+}
+.ulink::after{
+  content:'';position:absolute;left:0;bottom:-10px;
+  width:calc(100% + 10px);border-bottom:1px solid;
+  transform:scale(0,1);transform-origin:0% 50%;
+  transition:transform 330ms;
+}
+.ulink:hover::after,.ulink:focus::after{transform:scale(1)}
+.ulink:hover,.ulink:focus{outline:0}
+.ulink:active,.ulink:focus{color:#b73241}
+
+/* ============ 控件 ============ */
+.btn{
+  display:inline-flex;align-items:center;gap:12px;
+  background:var(--accent);color:#fff;
+  font-size:15px;font-weight:500;letter-spacing:.04em;
+  padding:14px 24px;border-radius:0;
+}
+.tlink{
+  display:inline-flex;align-items:center;gap:10px;
+  color:var(--accent);font-size:16px;font-weight:500;
+  position:relative;text-decoration:none;
+}
+.tlink::after{
+  content:'';position:absolute;left:0;bottom:-10px;
+  width:calc(100% + 10px);border-bottom:1px solid;
+  transform:scale(0,1);transform-origin:0% 50%;
+  transition:transform 330ms;
+}
+.tlink:hover::after,.tlink:focus::after{transform:scale(1)}
+.tlink:hover,.tlink:focus{outline:0}
+.tlink:hover .arrow::before,.tlink:focus .arrow::before{width:21px}
+.tlink:hover .arrow::after,.tlink:focus .arrow::after{transform:translate(9px,-50%) rotate(45deg)}
+.btn:hover .arrow::before,.btn:focus .arrow::before{width:45px}
+.btn:hover .arrow::after,.btn:focus .arrow::after{transform:translate(15px,-50%) rotate(45deg)}
+
+
+/* ============================================================
+   首屏轮播 · 品牌层
+   三条规矩，全部沿用站内已有的语言，不新增任何动效词汇：
+     图    clip-path 纵向擦除 .5s ease-out（和汉堡、分隔线同源）
+     文字  opacity + translateX(-(1.5vw+4.6px))，450/650/850/1050ms 阶梯
+           ——和全站滚动入场是同一个动作
+     缓推  scale(1)→(1.06) 7s ease-out，退场不写 transition 所以瞬回
+           ——和作品卡 hover 同一手法
+   停留 7 秒：只有这个时长才和 4s 缓推、0.75s 抽屉是同一个时间家族。
+   ============================================================ */
+.hero-top{position:relative;z-index:3}
+
+.cbg{position:absolute;inset:0;z-index:0;overflow:hidden}
+.cart{
+  position:absolute;inset:0;z-index:0;
+  clip-path:polygon(0 0,100% 0,100% 0,0 0);
+  transition:clip-path .5s ease-out;
+}
+.cart.is-prev{clip-path:polygon(0 0,100% 0,100% 100%,0 100%);transition:none;z-index:1}
+.cart.is-active{clip-path:polygon(0 0,100% 0,100% 100%,0 100%);z-index:2}
+.cart svg{width:100%;height:100%;display:block}
+.cart.is-active svg{transition:transform 7000ms ease-out;transform:scale(1.06)}
+.cart.is-art::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.55)}
+
+.cslides{position:relative;z-index:2;display:grid;min-height:300px}
+.cslide{grid-area:1 / 1;pointer-events:none}
+.cslide.is-active{pointer-events:auto}
+.cline{opacity:0;transform:translate(calc(-1 * (1.5vw + 4.6px)),0)}
+.cslide.is-active .cline{opacity:1;transform:translate(0,0)}
+.cline[data-c="1"]{transition:transform 450ms ease,opacity 300ms ease}
+.cline[data-c="2"]{transition:transform 650ms ease,opacity 500ms ease}
+.cline[data-c="3"]{transition:transform 850ms ease,opacity 700ms ease}
+.cline[data-c="4"]{transition:transform 1050ms ease,opacity 900ms ease}
+/* 离场必须比入场快得多，否则两张的文案会在切换中叠在一起——
+   中文字块密实，叠 200ms 以上就糊成一团。
+   位移等淡完之后(160ms)再瞬间复位，复位时已经看不见了。 */
+.cslide:not(.is-active) .cline{
+  transition:opacity 160ms ease,transform 0s linear 160ms;
+}
+
+/* 控件：编号 + 细线进度 + 站内那个箭头。没有圆点，没有圆形按钮。 */
+.cnav{
+  position:relative;z-index:3;
+  grid-column:2 / 12;
+  display:flex;align-items:center;gap:30px;
+  margin-top:48px;color:#fff;
+}
+.cnum{font-size:13px;letter-spacing:.2em;font-variant-numeric:tabular-nums;color:#b1b1b1}
+.cnum b{font-weight:500;color:#fff}
+.cbars{display:flex;gap:12px;margin-right:auto}
+.cbar{position:relative;display:block;width:64px;height:14px;padding:0;cursor:pointer}
+.cbar::before{content:'';position:absolute;left:0;top:50%;width:100%;height:1px;
+  background:#fff;opacity:.25}
+/* 进度线：scaleX 从左展开——和正文链接下划线是同一个动作，只是拉成 7 秒 */
+.cbar i{position:absolute;left:0;top:50%;width:100%;height:1px;background:#fff;
+  transform:scaleX(0);transform-origin:0% 50%}
+.cbar.is-on i{transform:scaleX(1);transition:transform 7000ms linear}
+.cbar.is-held i{transform:scaleX(1);transition:none}
+.cnext{display:flex;align-items:center;color:#fff;cursor:pointer;padding:4px}
+.cnext:hover .arrow::before,.cnext:focus .arrow::before{width:45px}
+.cnext:hover .arrow::after,.cnext:focus .arrow::after{transform:translate(15px,-50%) rotate(45deg)}
+
+/* ============================================================
+   公告条 · 促销层
+   促销信息留在绿条，hero 保持干净——否则三秒之内
+   这套"设计与制造"的气质就会变成电商气质。
+   单行纵向翻动，4 秒一条，无图无控件。
+   ============================================================ */
+.ticker{
+  grid-column:2 / 12;position:relative;display:grid;overflow:hidden;
+  min-height:1.9em;
+}
+.tick{
+  grid-area:1 / 1;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 26px;
+  opacity:0;transform:translateY(100%);
+  transition:transform .5s ease,opacity .3s ease;
+  pointer-events:none;
+}
+.tick.is-on{opacity:1;transform:translateY(0);pointer-events:auto}
+.tick.is-out{opacity:0;transform:translateY(-100%)}
+.tick p{font-size:17px;letter-spacing:.02em}
+
+@media (prefers-reduced-motion:reduce){
+  .cart.is-active svg{transform:none}
+  .cbar.is-on i{transform:scaleX(1)}
+}
+
+/* ============ Hero ============ */
+.hero{padding:170px 0 80px}
+.hero-top{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:22px;margin:0 var(--gut) 120px;
+}
+.wordmark{display:flex;align-items:center;gap:16px;font-size:30px;font-weight:300;letter-spacing:.22em}
+.wordmark svg{width:26px;height:26px}
+
+/* ============ 公告条 ============ */
+.band{
+  background:var(--lime);color:var(--ink);padding:26px 0;
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+  transition:clip-path .4s ease-out;
+}
+.band.wipe{clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+.band-row{grid-column:2 / 12;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 28px}
+.band-row p{font-size:17px;letter-spacing:.02em}
+.band .tlink{color:var(--ink)}
+
+/* ============ 品牌片 ============ */
+.reel{
+  position:relative;background:#121212;aspect-ratio:16 / 8.5;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+  transition:clip-path .4s ease-out;
+}
+.reel.wipe{clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+.reel svg.art{position:absolute;inset:0;width:100%;height:100%}
+.reel-play{position:relative;z-index:2;display:flex;align-items:center;gap:16px;color:#fff;font-size:16px;font-weight:500;letter-spacing:.14em}
+.reel-play span.ring{
+  width:62px;height:62px;border:1px solid rgba(255,255,255,.75);border-radius:999rem;
+  display:grid;place-items:center;transition:transform .4s ease;
+}
+.reel-play:hover span.ring{transform:scale(1.08)}
+
+/* ============ 图标列表 ============ */
+.iconlist{display:grid;row-gap:76px}
+.iconrow{display:grid;grid-template-columns:72px 1fr;column-gap:90px;align-items:start}
+.ico{width:72px;height:72px;stroke:currentColor;fill:none;stroke-width:1.1}
+.item{display:flex;flex-direction:column;gap:16px}
+
+/* ============ 产品栅格 ============ */
+/* ============================================================
+   作品卡片：429×530 的竖构图整块铺满，内容层压在图上。
+   静止态只露客户名和标题；hover 才把遮罩、白色字标、描述和箭头
+   一起长出来——静止和悬停是两个不同的信息密度。
+   ============================================================ */
+.work{display:grid;grid-template-columns:repeat(3,1fr);column-gap:24px;row-gap:24px}
+.work a{display:flex;flex-direction:column;gap:22px;text-decoration:none}
+.shot{position:relative;width:100%;aspect-ratio:429 / 530;overflow:hidden;display:block}
+.shot > svg{width:100%;height:100%;display:block}
+/* 进场 4 秒缓推，退场不写 transition 所以是瞬回——
+   移开时图片才推进百分之一二，回弹根本察觉不到。 */
+.work a:hover .shot > svg,
+.work a:focus-visible .shot > svg{transition:transform 4s ease-out;transform:scale(1.1)}
+.shot::after{
+  content:'';position:absolute;inset:0;z-index:1;
+  background:rgba(0,0,0,.5);opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+}
+.work a:hover .shot::after,.work a:focus-visible .shot::after{opacity:1}
+.overlay{
+  position:absolute;inset:0;z-index:2;padding:78px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:26px;text-align:center;color:#fff;
+}
+.overlay > *{opacity:0;transition:opacity .2s ease}
+.work a:hover .overlay > *,.work a:focus-visible .overlay > *{opacity:1}
+.work a:hover .overlay .arrow::before,
+.work a:focus-visible .overlay .arrow::before{width:45px}
+.work a:hover .overlay .arrow::after,
+.work a:focus-visible .overlay .arrow::after{transform:translate(15px,-50%) rotate(45deg)}
+.brandmark{font-size:26px;font-weight:500;letter-spacing:.2em}
+.blurb{font-size:28px;font-weight:300;line-height:1.3}
+.capt{display:flex;flex-direction:column;gap:10px}
+.work .client{font-size:15px;color:var(--ink-60);letter-spacing:.08em}
+.work .title{font-size:24px;font-weight:400;line-height:1.5;max-width:16em;letter-spacing:.01em}
+/* 中文覆盖层：字标字距放大，描述比拉丁小一档 */
+.brandmark{font-size:21px;letter-spacing:.32em}
+.blurb{font-size:24px;line-height:1.65;letter-spacing:.01em}
+
+/* ============ 能力三列 ============ */
+.services{
+  grid-column:2 / 12;display:grid;grid-template-columns:repeat(3,1fr);
+  column-gap:var(--colgap);row-gap:60px;margin-top:150px;
+}
+.services h3{font-size:17px;font-weight:500;color:var(--accent);margin-bottom:34px;letter-spacing:.08em}
+.services p{font-size:24px;font-weight:300;line-height:1.75;letter-spacing:.01em}
+
+/* ============ 合作品牌 ============ */
+.clients{padding:100px 175px}
+.client-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--hair-dark);margin-top:80px;
+}
+.client-grid li{
+  background:var(--paper);height:150px;display:grid;place-items:center;
+  font-size:17px;font-weight:500;letter-spacing:.16em;color:#8d8d8d;
+  transition:color .3s ease;
+}
+.client-grid li:hover{color:var(--ink)}
+
+/* ============ 居中块 ============ */
+.center{text-align:center}
+.center .inner{grid-column:3 / 11;display:flex;flex-direction:column;align-items:center;gap:36px}
+
+/* ============ 公益：图文对开 ============ */
+.imgaside{display:grid;grid-template-columns:1fr 1fr;align-items:stretch}
+.imgaside .pic{background:#744467;min-height:540px}
+.imgaside .pic svg{width:100%;height:100%;display:block}
+.imgaside .copy{padding:110px var(--gut) 110px 90px;display:flex;flex-direction:column;gap:28px;align-items:flex-start}
+.stats{display:flex;gap:56px;flex-wrap:wrap;margin-top:6px}
+.stats div{display:flex;flex-direction:column;gap:8px}
+.stats b{font-size:38px;font-weight:300;letter-spacing:.01em;line-height:1.2}
+.stats span{line-height:1.6}
+.stats span{font-size:15px;color:var(--paper-70);letter-spacing:.04em;line-height:1.6}
+
+/* ============ 历程卡片 ============ */
+.cards{
+  grid-column:2 / 12;display:grid;grid-template-columns:repeat(3,1fr);
+  column-gap:var(--colgap);row-gap:48px;margin-top:96px;
+}
+.card{display:flex;flex-direction:column;gap:16px;border-top:1px solid var(--hair-dark);padding-top:22px}
+.card h4{transition:color .2s ease}
+.card:hover h4,.card:focus-visible h4{color:var(--accent)}
+.card .small{opacity:0;transition:opacity .2s ease}
+.card:hover .small,.card:focus-visible .small{opacity:1}
+.foot-cols a:hover,.foot-cols a:focus{color:var(--accent)}
+.card .meta{font-size:14px;color:var(--ink-60);letter-spacing:.1em}
+.card h4{font-size:24px;font-weight:400;line-height:1.5;letter-spacing:.01em}
+
+/* ============ 页脚 ============ */
+.foot-grid{grid-column:2 / 12;display:grid;grid-template-columns:1fr 1fr;gap:80px 24px}
+.foot-big{font-size:clamp(26px,calc(1.1vw + 22px),42px);font-weight:300;line-height:1.5;letter-spacing:.02em}
+.foot-en{font-size:15px;color:#8a8a8a;letter-spacing:.16em;margin-top:22px}
+.foot-cols{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;align-content:start}
+.foot-cols a,.foot-cols p{font-size:15px;line-height:2.1;color:#cfcfcf}
+.foot-cols a:hover{color:#fff}
+.foot-cols .tbd{color:#7a7a7a}
+.foot-rule{grid-column:2 / 12;height:1px;background:var(--hair-light);margin:96px 0 34px}
+.foot-legal{grid-column:2 / 12;display:flex;flex-wrap:wrap;gap:12px 32px;font-size:14px;color:#8a8a8a}
+
+/* ============ 入场：横向、从左 ============ */
+.js [data-reveal].pending{opacity:0;transform:translate(calc(-1 * (1.5vw + 4.6px)),0)}
+[data-reveal]{transition:transform 450ms ease,opacity 300ms ease}
+[data-reveal="2"]{transition:transform 650ms ease,opacity 500ms ease}
+[data-reveal="3"]{transition:transform 850ms ease,opacity 700ms ease}
+[data-reveal="4"]{transition:transform 1050ms ease,opacity 900ms ease}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none !important}
+  .js [data-reveal].pending{opacity:1;transform:none}
+  .band.wipe,.reel.wipe,.rail-menu i.wipe{clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+}
+
+@media (max-width:1100px){
+  :root{--pad-y:96px;--gut:40px}
+  .work{grid-template-columns:repeat(2,1fr)}
+  .client-grid{grid-template-columns:repeat(3,1fr)}
+  .clients{padding:80px 40px}
+  .imgaside .copy{padding:70px 40px}
+}
+@media (max-width:760px){
+  :root{--rail:44px;--pad-y:64px;--gut:20px;--inset-r:12px}
+  .rail-mark{margin-top:96px}
+  .rail-mark svg{width:30px;height:30px}
+  .rail-label span{font-size:12px;letter-spacing:.42em}
+  .cslides{min-height:430px}
+  .cnav{margin-top:44px;gap:18px;flex-wrap:wrap}
+  .cbar{width:44px}
+  .ticker{min-height:3.4em}
+  .hero{padding:96px 0 56px}
+  .hero-top{margin-bottom:80px;gap:18px}
+  .hero-top .btn{padding:12px 18px;font-size:14px}
+  .wordmark{font-size:22px;letter-spacing:.18em}
+  .c-head,.c-aside,.c-left,.c-rows,
+  .services,.cards,.foot-grid,.foot-rule,.foot-legal,.band-row{grid-column:2 / 12}
+  .drawer{padding-left:20px;padding-right:20px;padding-top:110px;gap:38px}
+  .nav-item h2{font-size:30px}
+  .nav-primary{gap:26px}
+  .stack{gap:24px}
+  br.pc{display:none}
+  .c-aside,.c-rows{margin-top:36px}
+  .iconlist{row-gap:48px}
+  .iconrow{grid-template-columns:52px 1fr;column-gap:26px}
+  .ico{width:52px;height:52px}
+  .services{grid-template-columns:1fr;margin-top:64px;row-gap:44px}
+  .work{grid-template-columns:1fr;row-gap:44px}
+  .cards{grid-template-columns:1fr;margin-top:56px}
+  .client-grid{grid-template-columns:repeat(2,1fr);margin-top:48px}
+  .client-grid li{height:110px;font-size:14px}
+  .clients{padding:64px 20px}
+  .imgaside{grid-template-columns:1fr}
+  .imgaside .pic{min-height:280px}
+  .stats{gap:32px}
+  .stats b{font-size:30px}
+  .foot-grid{grid-template-columns:1fr}
+  .foot-rule{margin:56px 0 24px}
+  .center .inner{grid-column:2 / 12}
+  .reel{aspect-ratio:16 / 11}
+}
