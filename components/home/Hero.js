@@ -1,54 +1,19 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import StarMark from '@/components/StarMark';
+import Image from 'next/image';
+import BrandLockup from '@/components/BrandLockup';
 import usePrefersReducedMotion from '@/components/hooks/usePrefersReducedMotion';
+import { HERO_SLIDES } from '@/content/home';
 
-const SLIDES = [
-  {
-    eyebrow: '宠物舒适方案 · 自 2001 年',
-    title: ['让宠物在每一个环境里，', '都待得住'],
-    lede: '宠适从一间小作坊起步，二十余年只做一件事：把室内的安顿和户外的自在接上。我们有自己的木作、缝制、金属三类工厂，从研发、制造到出货全程自控。',
-    cta: { href: '#capability', label: '了解我们的能力' },
-    art: null,
-  },
-  {
-    eyebrow: '远径系列 · 新品',
-    title: ['山路上的四个小时，', '让它能睡过去'],
-    lede: '防水 TPU 箱底，整只可以直接冲洗；多舱位把水壶、零食和牵引绳分开放。徒步回来冲一遍就能收起来。',
-    cta: { href: '#products', label: '查看远径系列' },
-    art: (
-      <svg viewBox="0 0 1336 767" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <rect width="1336" height="767" fill="#6f7a63" />
-        <path d="M0 767V392l318 124 286-196 332 238 400-186v395z" fill="#59634f" />
-        <path d="M0 767V566l286 78 350-108 330 122 370-96v205z" fill="#454d3d" />
-        <circle cx="1046" cy="176" r="86" fill="#8a9479" />
-      </svg>
-    ),
-  },
-  {
-    eyebrow: '自有制造 · 自 2005 年',
-    title: ['木作、缝制、金属，', '三类工厂都是自己的'],
-    lede: '2005 年起我们把生产的起点收回自己手里。二十年为 K&H、PETCO、TRIXIE 等品牌做 ODM，别人的品控标准，我们一条条走过来。',
-    cta: { href: '#about', label: '看我们怎么做' },
-    art: (
-      <svg viewBox="0 0 1336 767" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <rect width="1336" height="767" fill="#7d6a57" />
-        <rect x="0" y="470" width="1336" height="297" fill="#5f5145" />
-        <rect x="128" y="150" width="268" height="320" fill="#6b5a4a" />
-        <rect x="470" y="238" width="196" height="232" fill="#96806a" />
-        <rect x="742" y="110" width="330" height="360" fill="#6b5a4a" />
-        <circle cx="1188" cy="286" r="74" fill="#a08a72" />
-      </svg>
-    ),
-  },
-];
+const SLIDES = HERO_SLIDES;
 
 const COUNT = SLIDES.length;
 const pad = (n) => String(n).padStart(2, '0');
 
 // 1 · 首屏轮播：7s 一张，任一次手动操作后永久停止自动播放。
-// 三张的文字都在服务端输出到 HTML 里，浏览器里只切换 class。
+// 每一张的文字都在服务端输出到 HTML 里，浏览器里只切换 class。
 export default function Hero() {
   const reduce = usePrefersReducedMotion();
   const [cur, setCur] = useState(0);
@@ -90,71 +55,187 @@ export default function Hero() {
     manual((cur + (dx < 0 ? 1 : COUNT - 1)) % COUNT);
   };
 
+  // 地址栏里已经是同一个锚点时（比如刚点过一次、或带着 #air-carrier 刷新），再点浏览器不会再滚——
+  // 目标就在本页的话自己滚过去，并把地址同步上；目标不在本页（以后有了独立页面）才交给 Link 正常跳转
+  const goSection = (e, href) => {
+    const id = href.split('#')[1];
+    const target = id && document.getElementById(id);
+    if (!target) return;
+    e.preventDefault();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    if (window.location.hash !== `#${id}`) window.history.pushState(null, '', href);
+  };
+
+  const tone = SLIDES[cur].tone;
+  const showMark = !!SLIDES[cur].wordmark;
+
   return (
-    <section className="slab dark hero" data-label="品牌">
+    <section
+      className={`slab dark hero tone-${tone}`}
+      data-label="品牌"
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+      onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
+      onTouchEnd={onTouchEnd}
+    >
       <div className="hero-top">
-        <div className="wordmark">
-          <StarMark />
-          宠适
+        {/* 字标只在 content 里标了 wordmark 的那几张出现；占位保留，切到别的张时淡出 */}
+        <div className={`wordmark${showMark ? '' : ' is-off'}`} aria-hidden={showMark ? undefined : 'true'}>
+          <BrandLockup />
         </div>
-        <a className="btn" href="#contact">联系我们
-          <i className="arrow sm" aria-hidden="true"></i>
-        </a>
       </div>
 
-      <div className="cbg" aria-hidden="true">
-        {SLIDES.map((s, i) => (
-          <div
-            key={i}
-            data-i={i}
-            className={`cart${s.art ? ' is-art' : ''}${i === cur ? ' is-active' : ''}${i === prev && i !== cur ? ' is-prev' : ''}`}
-          >
-            {s.art}
-          </div>
-        ))}
+      {/* 右上角「关于我们」：不在字标那一行里，单独贴着海报右上角，右缘和右侧圆圈对齐 */}
+      <Link className="habout" href="/#about">
+        关于我们
+        <svg viewBox="0 0 24 12" aria-hidden="true">
+          <path d="M1 6h21M17 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </Link>
+
+      <div className="cbg">
+        {SLIDES.map((s, i) => {
+          const state = `${i === cur ? ' is-active' : ''}${i === prev && i !== cur ? ' is-prev' : ''}`;
+          const photo = (
+            <Image
+              src={s.image}
+              alt={s.alt}
+              fill
+              sizes="100vw"
+              priority={i === 0}
+              placeholder="blur"
+              style={{ objectFit: 'cover' }}
+            />
+          );
+          return (
+            <div
+              key={s.id}
+              data-i={i}
+              className={`cart is-img tone-${s.tone} layout-${s.layout}${state}`}
+              style={s.position && { '--pos': s.position, '--pos-m': s.positionMobile }}
+            >
+              {s.layout === 'top' ? (
+                // 标题放在图片容器里，跟着图片一起缩放，才能一直压在拼图自带的顶部横条上
+                <div className="cart-strip">
+                  {photo}
+                  <div className="strip-title">
+                    <h2 className="h-title">
+                      {s.title}
+                      {s.tags.map((t) => <small key={t}>{t}</small>)}
+                    </h2>
+                  </div>
+                </div>
+              ) : photo}
+              {s.slogan && (
+                // 设计稿上的手写标语，描成矢量后放回海报原处（CSS 背景图，不用 <img>：免得被 .cart img 那几条缩放规则牵连）；
+                // 文字本身在下面的文字层里给爬虫和读屏
+                <span className="slogan-art" aria-hidden="true" />
+              )}
+              {/* 整张海报可点，跳到对应栏目；每张的链接都输出在 HTML 里，只有当前这张能点、能被 Tab 到 */}
+              <Link
+                className="cart-link"
+                href={s.cta.href}
+                aria-label={s.cta.label}
+                tabIndex={i === cur ? 0 : -1}
+                draggable={false}
+                onClick={(e) => goSection(e, s.cta.href)}
+              />
+            </div>
+          );
+        })}
       </div>
 
-      {/* 焦点进到轮播里就先别动，别把人正在读的那张换掉；交给用户之后才播报 */}
+      {/* 焦点进到首屏里就先别动（写在 section 上），别把人正在读的那张换掉；交给用户之后才播报 */}
       <div
         className="cslides"
         id="cslides"
         aria-roledescription="轮播"
         aria-label="品牌主张"
         aria-live={userStopped ? 'polite' : undefined}
-        onFocus={() => setPaused(true)}
-        onBlur={() => setPaused(false)}
-        onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
-        onTouchEnd={onTouchEnd}
       >
-        {SLIDES.map((s, i) => (
-          <div
-            key={i}
-            data-i={i}
-            className={`cslide grid${i === cur ? ' is-active' : ''}`}
-            role="group"
-            aria-label={`第 ${i + 1} 张，共 ${COUNT} 张`}
-          >
-            <div className="c-head stack">
-              <p className="eyebrow cline" data-c="1">{s.eyebrow}</p>
-              <h1 className="display cline" data-c="2">{s.title[0]}<br className="pc" />{s.title[1]}</h1>
+        {SLIDES.map((s, i) => {
+          // 整页只留一个 h1，其余幻灯片用 h2
+          const Title = i === 0 ? 'h1' : 'h2';
+          return (
+            <div
+              key={s.id}
+              data-i={i}
+              className={`cslide grid layout-${s.layout} is-${s.id}${s.wordmark ? ' has-mark' : ''}${i === cur ? ' is-active' : ''}`}
+              role="group"
+              aria-label={`第 ${i + 1} 张，共 ${COUNT} 张`}
+            >
+              {s.layout === 'left' && (
+              <div className="h-copy">
+                {s.kicker && <p className="h-kicker cline" data-c="1">{s.kicker}</p>}
+                <Title className={`h-title cline${s.compact ? ' is-compact' : ''}`} data-c="1">
+                  {s.title}
+                  {s.sub && <small>{s.sub}</small>}
+                </Title>
+
+                {s.checks && (
+                  <ul className="h-checks cline" data-c="2">
+                    {s.checks.map((c) => (
+                      <li key={c.text} className={c.hot ? 'is-hot' : undefined}>
+                        <CheckIcon />
+                        <span>{c.strong && <b>{c.strong}</b>}{c.text}{c.note && <small>{c.note}</small>}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {s.lines && (
+                  <div className="h-lines cline" data-c="2">
+                    {s.lines.map((l) => (
+                      <p key={l.text} className={l.strong ? 'is-strong' : undefined}>{l.text}</p>
+                    ))}
+                  </div>
+                )}
+
+                {s.lead && (
+                  <p className="h-lead cline" data-c="2">{s.lead[0]}<b>{s.lead[1]}</b>{s.lead[2]}</p>
+                )}
+
+                {s.stats && (
+                  <ul className="h-stats cline" data-c="3">
+                    {s.stats.map((st) => (
+                      <li key={st.label}>
+                        <StatIcon name={st.icon} />
+                        <div>
+                          <p className="h-stat-num"><b>{st.num}</b><small>{st.unit}</small></p>
+                          <p className="h-stat-label">{st.label}</p>
+                          <p className="h-stat-en">{st.en}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              )}
+
+              {s.slogan && (
+                <p className="h-slogan">{s.slogan.join('')}</p>
+              )}
             </div>
-            <div className="c-aside">
-              <p className="lede cline" data-c="3">{s.lede}</p>
-              <p className="cline" data-c="4" style={{ marginTop: 28 }}>
-                <a className="tlink" href={s.cta.href}>{s.cta.label}<i className="arrow sm" aria-hidden="true"></i></a>
-              </p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* 海报左右两侧的上一张 / 下一张 */}
+      <button className="cside is-prev" aria-label="上一张" onClick={() => manual((cur + COUNT - 1) % COUNT)}>
+        <Chevron dir="left" />
+      </button>
+      <button className="cside is-next" aria-label="下一张" onClick={() => manual((cur + 1) % COUNT)}>
+        <Chevron dir="right" />
+      </button>
 
       <div className="grid">
         <div className="cnav">
           <span className="cnum"><b id="cnum">{pad(cur + 1)}</b> / {pad(COUNT)}</span>
           <div className="cbars" id="cbars">
-            {SLIDES.map((_, i) => (
+            {SLIDES.map((s, i) => (
               <button
-                key={i}
+                key={s.id}
                 className={`cbar${i === cur ? (autoOn ? ' is-on' : ' is-held') : ''}`}
                 data-go={i}
                 aria-label={`第 ${i + 1} 张`}
@@ -164,11 +245,52 @@ export default function Hero() {
               </button>
             ))}
           </div>
-          <button className="cnext" id="cnext" aria-label="下一张" onClick={() => manual((cur + 1) % COUNT)}>
-            <i className="arrow" aria-hidden="true"></i>
-          </button>
         </div>
       </div>
     </section>
+  );
+}
+
+function Chevron({ dir }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={dir === 'left' ? 'M14.5 5l-7 7 7 7' : 'M9.5 5l7 7-7 7'} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg className="h-check" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="11" fill="currentColor" />
+      <path d="M6.6 12.4l3.6 3.5 7.2-7.6" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const STAT_ICONS = {
+  // 教学楼
+  campus: <path d="M24 5l15 8v3h-3v17h4v4H8v-4h4V16H9v-3zM16 19v14h5v-8h6v8h5V19zM22 11h4v4h-4z" />,
+  // 爪印
+  stray: (
+    <>
+      <circle cx="11" cy="19" r="4.2" />
+      <circle cx="19.5" cy="10" r="4.6" />
+      <circle cx="29.5" cy="10" r="4.6" />
+      <circle cx="38" cy="19" r="4.2" />
+      <path d="M24.5 20c6 0 12 6 12 12 0 4-3 6.5-6.5 6.5-2 0-3.5-1-5.5-1s-3.5 1-5.5 1c-3.5 0-6.5-2.5-6.5-6.5 0-6 6-12 12-12z" />
+    </>
+  ),
+  // 一摞钱币
+  funds: <path d="M24 6c8 0 14 2 14 5s-6 5-14 5-14-2-14-5 6-5 14-5zM10 17c2 3 8 4 14 4s12-1 14-4v5c0 3-6 5-14 5s-14-2-14-5zm0 10c2 3 8 4 14 4s12-1 14-4v5c0 3-6 5-14 5s-14-2-14-5zm0 0" />,
+  // 纸箱
+  supplies: <path d="M24 5l16 7v20l-16 8-16-8V12zm0 5l-9 4 9 4 9-4zM12 17v12l10 5V22zm24 0l-10 5v12l10-5z" />,
+};
+
+function StatIcon({ name }) {
+  return (
+    <svg className="h-stat-icon" viewBox="0 0 48 44" fill="currentColor" aria-hidden="true">
+      {STAT_ICONS[name]}
+    </svg>
   );
 }

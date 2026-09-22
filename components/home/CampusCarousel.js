@@ -1,0 +1,91 @@
+'use client';
+
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
+import usePrefersReducedMotion from '@/components/hooks/usePrefersReducedMotion';
+
+const COUNT_PAD = (n) => String(n).padStart(2, '0');
+
+// 校园公益海报轮播：1920×600 通宽，交叉淡入，7s 一张，手动操作后停止自动播放。
+// 文字是 HTML 压在图上；两侧 ‹ ›；右下页码 + 进度条。这一组只是展示，不做整张点击跳转。
+export default function CampusCarousel({ slides }) {
+  const reduce = usePrefersReducedMotion();
+  const count = slides.length;
+  const [cur, setCur] = useState(0);
+  const [prev, setPrev] = useState(null);
+  const [stopped, setStopped] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const touchX = useRef(null);
+  const autoOn = !reduce && !stopped;
+
+  const paint = (n) => { setPrev(cur); setCur(n); };
+  const manual = (n) => { setStopped(true); paint(n); };
+
+  useEffect(() => {
+    if (!autoOn || paused) return;
+    const t = setTimeout(() => paint((cur + 1) % count), 7000);
+    return () => clearTimeout(t);
+  }, [cur, autoOn, paused]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (prev === null) return;
+    const t = setTimeout(() => setPrev(null), 700);
+    return () => clearTimeout(t);
+  }, [prev]);
+
+  const onTouchEnd = (e) => {
+    if (touchX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) < 48) return;
+    manual((cur + (dx < 0 ? 1 : count - 1)) % count);
+  };
+
+  return (
+    <div
+      className="pcar"
+      aria-roledescription="轮播"
+      aria-label="校园公益活动"
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+      onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
+      onTouchEnd={onTouchEnd}
+    >
+      {slides.map((s, i) => {
+        const state = `${i === cur ? ' is-active' : ''}${i === prev && i !== cur ? ' is-prev' : ''}`;
+        return (
+          <div key={s.id} className={`pslide layout-${s.layout} is-${s.id}${state}`} role="group" aria-label={`第 ${i + 1} 张，共 ${count} 张`} aria-hidden={i === cur ? undefined : 'true'}>
+            {/* 图和手写标语放在同一层里一起缓推放大（和首屏一样 7s 到 1.06），文字层不动 */}
+            <div className="pshot">
+              <Image src={s.image} alt={s.alt} fill sizes="100vw" placeholder="blur" style={{ objectFit: 'cover' }} priority={false} />
+              {s.slogan && <span className="p-slogan-art" aria-hidden="true" />}
+            </div>
+            <div className="pcopy">
+              {s.kicker && <p className="p-kicker">{s.kicker}</p>}
+              <h3 className="p-title">{s.title}</h3>
+              {s.sub && <p className="p-sub">{s.sub}</p>}
+            </div>
+            {/* 手写标语的文字留给读屏和爬虫；画面上显示的是 .pshot 里的矢量 */}
+            {s.slogan && <p className="p-slogan">{s.slogan}</p>}
+          </div>
+        );
+      })}
+
+      <button className="cside is-prev" aria-label="上一张" onClick={() => manual((cur + count - 1) % count)}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5l-7 7 7 7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      <button className="cside is-next" aria-label="下一张" onClick={() => manual((cur + 1) % count)}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+
+      <div className="cnav pcar-nav">
+        <span className="cnum"><b>{COUNT_PAD(cur + 1)}</b> / {COUNT_PAD(count)}</span>
+        <div className="cbars">
+          {slides.map((s, i) => (
+            <button key={s.id} className={`cbar${i === cur ? (autoOn ? ' is-on' : ' is-held') : ''}`} aria-label={`第 ${i + 1} 张`} onClick={() => manual(i)}><i></i></button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

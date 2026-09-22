@@ -139,7 +139,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   transition:opacity .2s ease,transform .2s ease;
 }
 .nav-item .arrow::before{width:43px}
-.nav-item .arrow::after{width:18px;height:18px}
+.nav-item .arrow::after{width:13px;height:13px}
 .nav-item:hover .arrow,.nav-item:focus-visible .arrow{opacity:1;transform:translateX(0)}
 .nav-item p{
   margin-top:12px;font-size:16px;color:#b1b1b1;
@@ -207,30 +207,34 @@ br.pc{display:inline}
 
 
 /* ============================================================
-   箭头：::before 是 3px 粗的横杆，::after 是 45° 旋转的方角＝箭头头。
-   hover 时杆变长、头前探，整体像被拉长，而不是整体平移。
+   箭头：细线一根 + 开口的尖头（照右上角「关于我们」那只 →），不再是粗横杆配方角。
+   ::before 是横线，::after 是只画上、右两边的方块转 45° 当尖头。
+   hover 时整只箭头前探 4px（各处的 hover 规则见 .tlink / .btn / .overlay）。
+   （首屏两侧的 ‹ › 和右下角「顶部」按钮是各自的 svg，不走这里）
    ============================================================ */
 .arrow{
+  --stroke:2px;   /* 浏览器会把边框宽度向下取整到整数设备像素，1.5px 在普通屏上会变成 1px，太细 */
   position:relative;display:inline-block;flex:none;
   width:30px;height:15px;color:currentColor;vertical-align:middle;
   transition:opacity .2s ease,transform .2s ease;
 }
 .arrow::before{
   content:'';position:absolute;left:0;top:50%;
-  width:30px;border-bottom:3px solid currentColor;
+  width:100%;border-bottom:var(--stroke) solid currentColor;   /* 线一直画到尖头处，线和头是连着的 */
+  transform:translateY(-50%);
   transition:width .2s ease;
 }
 .arrow::after{
-  content:'';position:absolute;right:1px;top:50%;
-  width:15px;height:15px;
-  border-right:3px solid currentColor;border-top:3px solid currentColor;
+  content:'';position:absolute;right:3px;top:50%;
+  width:10px;height:10px;
+  border-right:var(--stroke) solid currentColor;border-top:var(--stroke) solid currentColor;
+  border-top-right-radius:1px;
   transform:translate(0,-50%) rotate(45deg);
   transition:transform .2s ease;
 }
 /* 正文内链用小一号的箭头，幅度也小一档 */
 .arrow.sm{width:21px;height:11px}
-.arrow.sm::before{width:12px}
-.arrow.sm::after{width:11px;height:11px;border-width:2px}
+.arrow.sm::after{right:2px;width:7px;height:7px}
 
 /* ============================================================
    下划线：从左端 scaleX 展开，330ms；离文字 10px，比文字宽 10px。
@@ -270,10 +274,8 @@ br.pc{display:inline}
 }
 .tlink:hover::after,.tlink:focus::after{transform:scale(1)}
 .tlink:hover,.tlink:focus{outline:0}
-.tlink:hover .arrow::before,.tlink:focus .arrow::before{width:21px}
-.tlink:hover .arrow::after,.tlink:focus .arrow::after{transform:translate(9px,-50%) rotate(45deg)}
-.btn:hover .arrow::before,.btn:focus .arrow::before{width:45px}
-.btn:hover .arrow::after,.btn:focus .arrow::after{transform:translate(15px,-50%) rotate(45deg)}
+/* hover：整只箭头往前探 4px（和右上角「关于我们」一样），不再拉长线、不再分开头尾 */
+.tlink:hover .arrow,.tlink:focus .arrow,.btn:hover .arrow,.btn:focus .arrow{transform:translateX(4px)}
 
 
 /* ============================================================
@@ -291,11 +293,12 @@ br.pc{display:inline}
 .cbg{position:absolute;inset:0;z-index:0;overflow:hidden}
 .cart{
   position:absolute;inset:0;z-index:0;
-  clip-path:polygon(0 0,100% 0,100% 0,0 0);
-  transition:clip-path .5s ease-out;
+  opacity:0;
+  transition:opacity .6s ease;
 }
-.cart.is-prev{clip-path:polygon(0 0,100% 0,100% 100%,0 100%);transition:none;z-index:1}
-.cart.is-active{clip-path:polygon(0 0,100% 0,100% 100%,0 100%);z-index:2}
+/* 交叉淡入：上一张原样留在下层（连同它放大到一半的状态），新一张在上层淡进来，不会露底、不会跳 */
+.cart.is-prev{opacity:1;transition:none;z-index:1}
+.cart.is-active{opacity:1;z-index:2}
 .cart svg{width:100%;height:100%;display:block}
 .cart.is-active svg{transition:transform 7000ms ease-out;transform:scale(1.06)}
 .cart.is-art::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.55)}
@@ -334,9 +337,6 @@ br.pc{display:inline}
   transform:scaleX(0);transform-origin:0% 50%}
 .cbar.is-on i{transform:scaleX(1);transition:transform 7000ms linear}
 .cbar.is-held i{transform:scaleX(1);transition:none}
-.cnext{display:flex;align-items:center;color:#fff;cursor:pointer;padding:4px}
-.cnext:hover .arrow::before,.cnext:focus .arrow::before{width:45px}
-.cnext:hover .arrow::after,.cnext:focus .arrow::after{transform:translate(15px,-50%) rotate(45deg)}
 
 /* ============================================================
    公告条 · 促销层
@@ -432,10 +432,7 @@ br.pc{display:inline}
 }
 .overlay > *{opacity:0;transition:opacity .2s ease}
 .work a:hover .overlay > *,.work a:focus-visible .overlay > *{opacity:1}
-.work a:hover .overlay .arrow::before,
-.work a:focus-visible .overlay .arrow::before{width:45px}
-.work a:hover .overlay .arrow::after,
-.work a:focus-visible .overlay .arrow::after{transform:translate(15px,-50%) rotate(45deg)}
+.work a:hover .overlay .arrow,.work a:focus-visible .overlay .arrow{transform:translateX(4px)}
 .brandmark{font-size:26px;font-weight:500;letter-spacing:.2em}
 .blurb{font-size:28px;font-weight:300;line-height:1.3}
 .capt{display:flex;flex-direction:column;gap:10px}
@@ -491,27 +488,38 @@ br.pc{display:inline}
 .card:hover h4,.card:focus-visible h4{color:var(--accent)}
 .card .small{opacity:0;transition:opacity .2s ease}
 .card:hover .small,.card:focus-visible .small{opacity:1}
-.foot-cols a:hover,.foot-cols a:focus{color:var(--accent)}
 .card .meta{font-size:14px;color:var(--ink-60);letter-spacing:.1em}
 .card h4{font-size:24px;font-weight:400;line-height:1.5;letter-spacing:.01em}
 
 /* ============ 页脚 ============ */
-.foot-grid{grid-column:2 / 12;display:grid;grid-template-columns:1fr 1fr;gap:80px 24px}
-.foot-big{font-size:clamp(26px,calc(1.1vw + 22px),42px);font-weight:300;line-height:1.5;letter-spacing:.02em}
-.foot-en{font-size:15px;color:#8a8a8a;letter-spacing:.16em;margin-top:22px}
-.foot-cols{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;align-content:start}
-.foot-cols a,.foot-cols p{font-size:15px;line-height:2.1;color:#cfcfcf}
-.foot-cols a:hover{color:#fff}
-.foot-cols .tbd{color:#7a7a7a}
-.foot-rule{grid-column:2 / 12;height:1px;background:var(--hair-light);margin:96px 0 34px}
-.foot-legal{grid-column:2 / 12;display:flex;flex-wrap:wrap;gap:12px 32px;font-size:14px;color:#8a8a8a}
+/* ===== 页脚（紧凑版）：黑底，字标 + 栏目 / 公司信息 + 社媒图标 / 细线 + 法务行 ===== */
+.foot{background:var(--ink);color:var(--paper);padding:56px 0 40px;position:relative;z-index:0}
+.foot-top{grid-column:2 / 12;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.foot-mark .lockup{display:block;width:170px;height:auto}
+.foot-nav{display:flex;gap:36px;flex-wrap:wrap}
+.foot-nav a{font-size:15px;color:#e5e5e5;letter-spacing:.04em;transition:color .2s ease}
+.foot-nav a:hover{color:#fff}
+.foot-mid{grid-column:2 / 12;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;margin-top:44px}
+.foot-info{display:flex;flex-wrap:wrap;gap:0;font-size:14px;color:#9a9a9a;letter-spacing:.04em}
+.foot-info span + span::before{content:'·';margin:0 14px;color:#5a5a5a}
+.foot-icons{display:flex;gap:18px}
+.foot-icons a{display:block;color:#cfcfcf;transition:color .2s ease}
+.foot-icons a:hover{color:#fff}
+.foot-icons svg{display:block;width:22px;height:22px}
+.foot-rule{grid-column:2 / 12;height:1px;background:var(--hair-light);margin:40px 0 22px}
+.foot-legal{grid-column:2 / 12;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:13px;color:#8a8a8a}
+.foot-legal a{color:#8a8a8a;transition:color .2s ease}
+.foot-legal a:hover{color:#fff}
 
-/* ============ 入场：横向、从左 ============ */
-.js [data-reveal].pending{opacity:0;transform:translate(calc(-1 * (1.5vw + 4.6px)),0)}
-[data-reveal]{transition:transform 450ms ease,opacity 300ms ease}
-[data-reveal="2"]{transition:transform 650ms ease,opacity 500ms ease}
-[data-reveal="3"]{transition:transform 850ms ease,opacity 700ms ease}
-[data-reveal="4"]{transition:transform 1050ms ease,opacity 900ms ease}
+/* ============ 入场：横向、从左（照 union.co：文字节点各自滑入，图片只淡入） ============ */
+/* .rv = Reveal 挑出来的文字节点；.rv-img = 图片。参数和 union.co 一致：位移 450ms、透明度 300ms、偏移 1.5vw+4.6px */
+.js .rv.pending,.js [data-reveal].pending{opacity:0;transform:translate(calc(-1 * (1.5vw + 4.6px)),0)}
+.rv,[data-reveal]{transition:transform 450ms ease,opacity 300ms ease}
+.rv[data-rv="2"],[data-reveal="2"]{transition:transform 650ms ease,opacity 500ms ease}
+.rv[data-rv="3"],[data-reveal="3"]{transition:transform 850ms ease,opacity 700ms ease}
+.rv[data-rv="4"],[data-reveal="4"]{transition:transform 1050ms ease,opacity 900ms ease}
+.js .rv-img.pending{opacity:0}
+.rv-img{transition:opacity 500ms cubic-bezier(.6,.1,.4,1)}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -538,10 +546,9 @@ br.pc{display:inline}
   .ticker{min-height:3.4em}
   .hero{padding:96px 0 56px}
   .hero-top{margin-bottom:80px;gap:18px}
-  .hero-top .btn{padding:12px 18px;font-size:14px}
   .wordmark{font-size:22px;letter-spacing:.18em}
   .c-head,.c-aside,.c-left,.c-rows,
-  .services,.cards,.foot-grid,.foot-rule,.foot-legal,.band-row{grid-column:2 / 12}
+  .services,.cards,.foot-top,.foot-mid,.foot-rule,.foot-legal,.band-row{grid-column:2 / 12}
   .drawer{padding-left:20px;padding-right:20px;padding-top:110px;gap:38px}
   .nav-item h2{font-size:30px}
   .nav-primary{gap:26px}
@@ -561,8 +568,498 @@ br.pc{display:inline}
   .imgaside .pic{min-height:280px}
   .stats{gap:32px}
   .stats b{font-size:30px}
-  .foot-grid{grid-template-columns:1fr}
-  .foot-rule{margin:56px 0 24px}
+  .foot{padding:44px 0 32px}
+  .foot-top,.foot-mid{flex-direction:column;align-items:flex-start;gap:20px}
+  .foot-nav{gap:16px 24px}
+  .foot-info{flex-direction:column;gap:6px}
+  .foot-info span + span::before{content:none}
+  .foot-rule{margin:32px 0 18px}
   .center .inner{grid-column:2 / 12}
   .reel{aspect-ratio:16 / 11}
+}
+
+
+/* ============================================================
+   M2 新增。只加不改：上面原型的规则一条没动。
+   ============================================================ */
+
+/* ============ 首屏轮播（照《文案位置参考》） ============
+   框架不动：字标、联系按钮、页码 / 进度条 / 箭头都在原位。
+   变的是：底图换成浅色海报，文字用品牌深青；校园公益那张底图是深青色，用白字。
+   所以首屏分 tone-light / tone-dark 两种色调，字标和控件跟着当前这一张变色。 */
+:root{--brand:#2a687d;--hot:#c8161d;--hero-pale:#e4f8ff}
+.cart img{display:block;object-position:var(--pos,50% 50%)}
+.cart.is-active img{transition:transform 7000ms ease-out;transform:scale(1.06)}
+.cart.is-prev img{transform:scale(1.06)}
+/* 浅色海报左侧本来就留了白，这层只是再托一下文字；深色那张同理 */
+.cart.tone-light::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(228,248,255,.9) 0%,rgba(228,248,255,.55) 34%,rgba(228,248,255,0) 58%)}
+.cart.tone-dark::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(24,74,92,.55) 0%,rgba(24,74,92,.2) 45%,rgba(24,74,92,0) 70%)}
+
+/* 五联拼图不能裁：按原比例 1920×600 整张贴在首屏底部，上方用它自带横条的底色铺满 */
+.cart.layout-top{background:var(--hero-pale)}
+.cart.layout-top::after{display:none}
+/* 底部让出一条给页码 / 进度条 / 箭头，否则它们压在照片上看不清 */
+.cart-strip{position:absolute;left:0;right:0;bottom:calc(clamp(30px,3vw,56px) + 24px + clamp(12px,1.3vw,24px));aspect-ratio:1920 / 600;
+  /* 这张不带字标，上面只留一小段呼吸，拼图尽量铺满整宽；超宽屏上高度到顶就按高度定宽——
+     这时 left/right 同时给定会过约束，margin:auto 让它居中，而不是靠左留一大块空 */
+  margin:0 auto;
+  max-height:calc(100% - clamp(40px,3.8vw,72px) - clamp(30px,3vw,56px) - 24px - clamp(12px,1.3vw,24px))}
+.cart.layout-top.is-active img{transform:none;transition:none}
+
+/* 新海报是 1920×800 的横幅。首屏原来的上下留白按黑底大字设计，太高，
+   图片铺满时会被放大裁切、主体压到文字后面；这里把留白收紧，让首屏接近海报比例 */
+.hero{padding:clamp(56px,5.6vw,108px) 0 clamp(30px,3vw,56px);transition:color .4s ease}
+/* 字标行左右各缩进一个栏间距，和下面栅格第 2 栏里的文字左对齐（右边的按钮也因此和轮播箭头右对齐）。
+   字标底到标题顶的距离按设计稿：约等于标题字高 */
+.hero-top{margin:0 calc(var(--gut) + var(--colgap)) clamp(22px,3.05vw,58px)}
+.cslides{min-height:0}
+/* 各张文字一律顶对齐，起点才一致；居中的话内容高的那张会把别的张挤下去 */
+.cslide.layout-left{align-items:start}
+/* 这一行原来被右下角的箭头撑到 23px 高；箭头挪到海报两侧之后把高度留着，首屏才不会整体变矮 */
+.hero .cnav{margin-top:clamp(24px,2.6vw,48px);min-height:23px}
+.hero.tone-light{color:var(--brand)}
+.hero.tone-light .cnav{color:var(--brand)}
+.hero.tone-light .cnum{color:rgba(42,104,125,.6)}
+.hero.tone-light .cnum b{color:var(--brand)}
+.hero.tone-light .cbar::before,.hero.tone-light .cbar i{background:var(--brand)}
+
+/* 整张海报是一个链接（取代原来每张的「查看××」文字链接）。
+   盖在图片和渐变之上；文字层、字标行、控件行的空白处都让点击穿下去，只有轮播按钮自己接点击 */
+.cart-link{position:absolute;inset:0;z-index:1}
+.cart-link:focus-visible{outline-offset:-8px}
+.cslide.is-active,.hero-top,.hero .cnav{pointer-events:none}
+.hero .cnav button{pointer-events:auto}
+
+/* 右上角「关于我们」：和两侧圆圈、「顶部」按钮同一种半透明浅底的胶囊，右缘和右侧圆圈对齐。
+   悬停时翻成品牌青底白字，箭头整体前探 4px（细线箭头，不再用拉长横杆那一套）。
+   字标那一行原来由按钮撑到 50px（手机 42px）高，按钮挪出去之后把高度留着，首屏才不会变矮 */
+.hero-top{min-height:50px}
+.habout{
+  position:absolute;z-index:3;
+  top:clamp(40px,2vw,92px);right:clamp(12px,1.6vw,28px);
+  display:inline-flex;align-items:center;gap:10px;
+  height:46px;padding:0 22px;border-radius:23px;
+  background:rgba(240,240,240,.82);color:#1c1c1c;
+  border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 12px rgba(0,0,0,.12);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  font-size:15px;font-weight:500;letter-spacing:.08em;white-space:nowrap;
+  transition:background .25s ease,color .25s ease,border-color .25s ease;
+}
+.habout svg{display:block;width:22px;height:auto;transition:transform .25s ease}
+.habout:hover,.habout:focus-visible{background:var(--brand);color:#fff;border-color:transparent}
+.habout:hover svg,.habout:focus-visible svg{transform:translateX(4px)}
+@media (max-width:760px){
+  .hero-top{min-height:42px}
+  /* 手机上和字标在同一条线上（首屏上内边距 84px + 这一行 42px 居中） */
+  .habout{top:86px;right:12px;height:38px;padding:0 14px;gap:8px;font-size:13px}
+  .habout svg{width:18px}
+}
+
+/* ===== 校园公益海报轮播（1920×600 通宽，交叉淡入）===== */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pcar{position:relative;aspect-ratio:1920 / 600;overflow:hidden;background:var(--hero-pale);color:var(--brand);container-type:inline-size}
+.pslide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}
+.pslide.is-prev{opacity:1;transition:none;z-index:1}
+.pslide.is-active{opacity:1;z-index:2}
+.pslide img{display:block}
+.pshot{position:absolute;inset:0;transform:scale(1)}
+.pslide.is-active .pshot{transition:transform 7000ms ease-out;transform:scale(1.06)}
+.pslide.is-prev .pshot{transform:scale(1.06)}
+.pslide .cart-link{z-index:2}
+/* 文案：字号跟海报宽度走（cqw），位置按设计稿量的 */
+.pcopy{position:absolute;z-index:1;letter-spacing:.03em}
+.p-kicker{font-size:clamp(12px,1.9cqw,38px);font-weight:500;line-height:1.3}
+.p-title{font-size:clamp(16px,3.4cqw,66px);font-weight:700;line-height:1.2}
+.p-sub{font-size:clamp(11px,1.5cqw,30px);font-weight:400;line-height:1.5;margin-top:.5em}
+.layout-top .pcopy{left:0;right:0;top:5.5%;text-align:center}
+.layout-top .p-title{margin-top:.1em}
+/* 创新大赛：标题顶在 39.5%（设计稿量的），标题 2.7cqw 粗体，副题 2.1cqw 常规、字距拉开 */
+.layout-left .pcopy{left:5.6%;top:38%;max-width:60%}
+.layout-left .p-title{font-size:calc(clamp(15px,2.7cqw,54px) + 10px);letter-spacing:.04em;white-space:nowrap}
+.layout-left .p-sub{font-size:calc(clamp(12px,2.1cqw,42px) + 10px);letter-spacing:.12em;margin-top:.35em}
+/* 毕业生礼包：整块中心在 38.5%，标题顶 42%，标题 3.05cqw，副题 1.4cqw、字距拉开 */
+.layout-center .pcopy{left:5%;top:39%;width:61%;text-align:center}
+.layout-center .p-title{font-size:clamp(15px,4cqw,78px);letter-spacing:.04em;white-space:nowrap}
+.layout-center .p-sub{font-size:clamp(10px,1.75cqw,34px);letter-spacing:.16em;margin-top:.6em}
+/* 星火计划左下的手写标语（矢量，坐标系=海报 1920×600；viewBox 已是海报坐标，直接 contain） */
+.p-slogan{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.p-slogan-art{position:absolute;z-index:1;pointer-events:none;display:block;aspect-ratio:431.1 / 130.5;
+  background:url('/images/banners/campus-spark-slogan.svg') no-repeat center / contain;
+  left:calc(68.0 / 1920 * 100cqw);top:calc(436.9 / 1920 * 100cqw);width:calc(431.1 / 1920 * 100cqw)}
+/* 控件：页码 + 进度条 在左下；两侧 ‹ › 沿用首屏的 .cside */
+/* 页码 + 进度条：底部水平居中（不压左下的手写标语，也不压右下的爱心猫） */
+.pcar-nav{position:absolute;z-index:3;left:50%;transform:translateX(-50%);bottom:clamp(14px,2.2cqw,40px);margin:0;color:var(--brand);pointer-events:none;white-space:nowrap}
+.pcar-nav .cbars{margin-right:0}
+.pcar-nav .cnum{color:rgba(42,104,125,.6)}
+.pcar-nav .cnum b{color:var(--brand)}
+.pcar-nav .cbar{pointer-events:auto}
+.pcar-nav .cbar::before,.pcar-nav .cbar i{background:var(--brand)}
+@media (max-width:760px){
+  /* 手机上 1920×600 只有 100 来 px 高，压不下文字：海报按 4:3 裁（居中），文字字号给下限，手写标语不显示 */
+  .pcar{aspect-ratio:4 / 3}
+  .pcar-nav{bottom:10px;gap:12px}
+  .pcar-nav .cbar{width:36px}
+  .p-kicker{font-size:13px}
+  .p-title,.layout-left .p-title,.layout-center .p-title{font-size:20px}
+  .p-sub,.layout-center .p-sub{font-size:12px}
+  .layout-top .pcopy{top:8%}
+  .layout-left .pcopy{left:var(--gut);max-width:70%}
+  .layout-center .pcopy{left:8%;width:84%;top:38%}
+  .p-slogan-art{display:none}
+}
+
+/* ===== 关于我们：浅灰底 + 四个白格（24px 缝，和石板之间的缝一样） ===== */
+.slab.about-block{padding:96px 0}   /* 比 .slab.ground 的 50px 优先 */
+.about-block .group-head{border-bottom-color:var(--hair-dark)}
+.tiles{grid-column:2 / 12;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:64px}
+.tile{position:relative;display:flex;flex-direction:column;gap:22px;padding:34px 30px 30px;min-height:340px;background:var(--paper);color:var(--ink);text-decoration:none}
+.tile-head h3{font-size:24px;font-weight:500;letter-spacing:.03em;line-height:1.3;transition:color .2s ease}
+.tile-head .en{display:block;margin-top:6px;font-size:12px;letter-spacing:.14em;color:var(--ink-60)}
+.tile ul{display:flex;flex-direction:column;gap:9px;font-size:15px;line-height:1.7;color:#4a4a4a}
+.tile > .arrow{position:absolute;right:28px;bottom:30px;opacity:0;transform:translateX(-6px);transition:opacity .2s ease,transform .2s ease}
+.tile:hover h3,.tile:focus-visible h3{color:var(--accent)}
+.tile:hover > .arrow,.tile:focus-visible > .arrow{opacity:1;transform:none}
+@media (max-width:1100px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .tile{min-height:0}
+}
+@media (max-width:760px){
+  .tiles{grid-template-columns:1fr;gap:12px;margin-top:36px}
+  .tile{padding:24px 20px;gap:14px}
+  .tile-head h3{font-size:20px}
+}
+
+/* 海报两侧的上一张 / 下一张：小圆片里一个尖角，和右下角「顶部」按钮同一种底。
+   贴着海报左右边缘，落在文案栏左边的留白里，不压文字 */
+.cside{
+  position:absolute;z-index:3;top:50%;transform:translateY(-50%);
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(240,240,240,.82);color:#1c1c1c;
+  border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 12px rgba(0,0,0,.12);
+  transition:background .2s ease;
+}
+.cside.is-prev{left:clamp(12px,1.6vw,28px)}
+.cside.is-next{right:clamp(12px,1.6vw,28px)}
+.cside svg{display:block;width:22px;height:22px;transition:transform .2s ease}
+.cside:hover{background:#fff}
+.cside.is-prev:hover svg,.cside.is-prev:focus-visible svg{transform:translateX(-2px)}
+.cside.is-next:hover svg,.cside.is-next:focus-visible svg{transform:translateX(2px)}
+
+/* 文案块 */
+.h-copy{grid-column:2 / 8;grid-row:1;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(16px,1.7vw,26px);
+  /* 原来文案末尾有一行「查看××」链接，首屏高度是被它撑出来的。链接去掉后把这一行的位置留着，
+     否则首屏整体变矮，海报被裁得更多，各张图文的相对位置全跟着变 */
+  padding-bottom:calc(clamp(16px,1.7vw,26px) + 30px)}
+.h-title{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:.12em .28em;
+  font-size:clamp(34px,4.5vw,66px);font-weight:700;line-height:1.16;letter-spacing:.03em;
+}
+.h-title small{font-size:.5em;font-weight:500;letter-spacing:.04em}
+.h-title.is-compact{font-size:calc(clamp(26px,3.1vw,46px) + 5px)}
+.h-checks{display:flex;flex-direction:column;gap:14px}
+.h-checks li{display:flex;align-items:center;gap:14px;font-size:clamp(16px,1.55vw,23px);font-weight:500;letter-spacing:.03em}
+.h-checks li small{font-size:.78em;font-weight:400;margin-left:.2em}
+.h-check{flex:none;width:1.15em;height:1.15em}
+.h-checks .is-hot .h-check{color:var(--hot)}
+.h-checks .is-hot b{color:var(--hot);font-weight:700}
+/* 标题上面的小标题（保证登机计划那张）：比标题小一半，粗体，贴着标题 */
+.h-kicker{font-size:clamp(17px,2.05vw,30px);font-weight:700;letter-spacing:.03em;line-height:1.2;margin-bottom:calc(-1 * clamp(10px,1.1vw,18px))}
+.h-lines{display:flex;flex-direction:column;gap:10px}
+.h-lines p{font-size:clamp(16px,1.6vw,24px);font-weight:400;letter-spacing:.03em}
+.h-lines .is-strong{font-size:clamp(20px,2.2vw,33px);font-weight:700;letter-spacing:.04em}
+
+/* 校园公益那一张 */
+/* 这张没有字标，文案整体上提到字标行下面，标题中线大致对上右边左侧那只猫的眼睛。
+   用 top 而不是 margin：这张最高，动 margin 会把整个首屏的高度一起带矮 */
+@media (min-width:1101px){
+  /* 整块往右挪 19px、往上挪 34px。上移用负 margin：文字加大后这张变高会把整个首屏撑高，负 margin 正好把多出来的高度收回去 */
+  .cslide.is-campus .h-copy{position:relative;top:calc(6px - 1vw);left:19px;margin-top:-34px;margin-bottom:-22px}
+}
+/* 带字标的那两张（星选、飞屋）：字标连同文案整体下移 --drop；文案在此基础上再往下让一点，和字标拉开。
+   同样用 top，不动首屏高度 */
+@media (min-width:761px){
+  .hero{--drop:clamp(16px,1.8vw,34px)}
+  /* 字标比整体再多下移一小截，离标题近一点；文案不跟 */
+  .wordmark{position:relative;top:calc(var(--drop) + clamp(8px,.9vw,16px))}
+  .cslide.has-mark .h-copy{position:relative;top:calc(var(--drop) + clamp(14px,1.6vw,30px) - 10px);left:10px}
+  /* 带字标的三张文字各放大 5px（校园公益那张有自己的一套） */
+  .cslide.has-mark .h-title{font-size:calc(clamp(34px,4.5vw,66px) + 5px)}
+  .cslide.has-mark .h-kicker{font-size:calc(clamp(17px,2.05vw,30px) + 5px)}
+  .cslide.has-mark .h-checks li{font-size:calc(clamp(16px,1.55vw,23px) + 5px)}
+  .cslide.has-mark .h-lines p{font-size:calc(clamp(16px,1.6vw,24px) + 5px)}
+  .cslide.has-mark .h-lines .is-strong{font-size:calc(clamp(20px,2.2vw,33px) + 5px)}
+}
+.h-lead{font-size:calc(clamp(15px,1.45vw,21px) + 5px);font-weight:500;letter-spacing:.03em;margin-top:-10px}
+.h-lead b{font-size:1.7em;font-weight:700;margin:0 .08em;letter-spacing:0}
+.h-stats{display:grid;grid-template-columns:repeat(2,auto);gap:clamp(14px,1.6vw,26px) clamp(32px,4vw,64px);margin-top:2px}
+.h-stats li{display:flex;align-items:center;gap:14px}
+.h-stat-icon{flex:none;width:46px;height:42px}
+.h-stat-num b{font-size:calc(clamp(22px,2.1vw,31px) + 5px);font-weight:700;letter-spacing:.01em;line-height:1.1}
+.h-stat-num small{font-size:17px;margin-left:3px;vertical-align:top}
+.h-stat-label{font-size:20px;font-weight:500;letter-spacing:.06em;margin-top:2px}
+.h-stat-en{font-size:15px;letter-spacing:.04em;opacity:.85;margin-top:2px}
+ /* 标语文字只留给爬虫和读屏，画面上显示的是下面那张矢量图 */
+.h-slogan{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* 手写标语矢量图：坐标系是海报原图 1920×800 里的一块（x 955 y 192，351×175）。
+   海报按 cover 铺满、靠右对齐；这里用容器查询单位把同一套 cover 算式再算一遍，标语就始终贴在海报原处。
+   海报比容器更"扁"(容器高宽比 < 800/1920) 时按宽度铺满、上下裁；否则按高度铺满、左侧裁、右缘对齐 */
+.cart.is-img{container-type:size}
+.slogan-art{position:absolute;display:block;pointer-events:none;aspect-ratio:351.25 / 174.75;
+  background:url('/images/hero/campus-slogan.svg') no-repeat center / contain;
+  width:calc(351.25 / 1920 * 100cqw);left:calc(955 / 1920 * 100cqw);top:calc(50cqh + (192 - 400) / 1920 * 100cqw)}
+@container (max-aspect-ratio: 1920 / 800){
+  .slogan-art{width:calc(351.25 / 800 * 100cqh);left:auto;right:calc((1920 - 955 - 351.25) / 800 * 100cqh);top:calc(192 / 800 * 100cqh)}
+}
+/* 容器再窄一点，海报左侧被裁掉太多，标语会跑到文案栏上面——那就不显示（文案加大、右移后临界比约 2.3） */
+@container (max-aspect-ratio: 7 / 3){
+  .slogan-art{display:none}
+}
+
+/* 带宠出行那一张：标题压在拼图自带的顶部横条上（横条高约为图高的 12.5%，从左侧大图右缘、约 28% 处开始）。
+   标题在图片容器里，跟图片一起缩放。文字层在它上面，得让点击穿过去 */
+.cslides{pointer-events:none}
+.strip-title{
+  position:absolute;top:0;left:28%;right:1.5%;height:12.5%;
+  display:flex;align-items:center;justify-content:center;gap:2.4vw;
+  color:var(--brand);opacity:0;transform:translate(calc(-1 * (1.5vw + 4.6px)),0);
+  transition:opacity .4s ease .25s,transform .5s ease .25s;
+}
+.cart.is-active .strip-title{opacity:1;transform:none}
+.strip-title .h-title{font-size:clamp(15px,2.05vw,32px);gap:0 1.1em;letter-spacing:.12em;flex-wrap:nowrap;white-space:nowrap}
+.strip-title .h-title small{font-size:.74em;font-weight:400;letter-spacing:.1em}
+
+/* 书脊：菜单按钮在顶部（在上方操作更顺手），品牌标常驻底部，上下对称，标签居中 */
+.rail-menu{margin-top:44px;margin-bottom:0}
+.rail-mark{margin:0 0 40px;opacity:1}
+.rail-mark svg{width:46px;height:auto}
+/* 书脊标签：原来 14px 的两三个字撑不起这么高的一条竖栏。放大到 18px，下面配一行小号英文把长度补足，
+   上下各一条细线，把 菜单 — 标签 — 品牌标 连成一根完整的"脊" */
+.rail-label{flex-direction:column;gap:22px}
+.rail-label::before,.rail-label::after{content:'';width:1px;height:64px;background:var(--hair-dark)}
+.rail-label span{font-size:18px;letter-spacing:.5em}
+.rail-label em{
+  font-style:normal;writing-mode:vertical-rl;white-space:nowrap;
+  font-size:11px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#8a8a8a;
+  transition:opacity .4s ease,transform .32s cubic-bezier(.45,0,.2,1);
+}
+.rail-label.swapping em{opacity:0}
+
+/* 首屏字标：P 标 + PETSFIT + 宠适 的组合，只在第一张显示。
+   宽度按设计稿换算：组合字标约占海报宽的 17%，首屏里海报按高度铺满 */
+.wordmark{transition:opacity .4s ease,visibility .4s}
+.wordmark.is-off{opacity:0;visibility:hidden}
+.wordmark .lockup{display:block;width:clamp(190px,18.7vw,340px);height:auto}
+
+/* 菜单的 ✕：原型里横杠只下移 3px，和转成竖线的中杠不在中点相交，转 45° 之前其实是个"†"，所以看着歪。
+   这里让上、下两杠都收到中线，两条线在正中相交，✕ 才是正的 */
+.is-open .burger .b2{transform:translateY(8px)}
+.is-open .burger .b1{transform:translateY(-8px);opacity:0}
+
+/* 焦点框只给键盘用户看。点书脊开关菜单时脚本会挪动焦点（为了接下来按 Tab 能从对的地方开始），
+   浏览器会因此画出焦点框；鼠标、触屏操作时把它收起来，键盘操作照常显示 */
+[data-input="pointer"] .rail-menu:focus-visible,
+[data-input="pointer"] .drawer a:focus-visible{outline:none}
+.drawer:focus{outline:none}
+
+/* 整条书脊可点击。悬停时书脊向右探出一点、里面的东西跟着右移并略微放大，暗示这里会滑出菜单 */
+.rail{pointer-events:auto;cursor:pointer}
+.rail::before{
+  content:'';position:absolute;inset:0;z-index:-1;background:var(--ground);
+  transform-origin:0 50%;transition:transform .32s cubic-bezier(.45,0,.2,1);
+}
+/* 标签容器撑满书脊中段，放大它会盖住菜单按钮，所以只动里面的文字 */
+.rail-menu,.rail-mark svg{transition:transform .32s cubic-bezier(.45,0,.2,1)}
+.rail-label span{transition:opacity .4s ease,transform .32s cubic-bezier(.45,0,.2,1)}
+@media (hover:hover){
+  .rail:hover::before{transform:scaleX(1.14)}
+  .rail:hover .rail-menu{transform:translateX(5px) scale(1.12)}
+  .rail:hover .rail-label span,.rail:hover .rail-label em{transform:translateX(5px) scale(1.06)}
+  .rail:hover .rail-mark svg{transform:translateX(5px) scale(1.08)}
+  .nav-open .rail:hover::before{transform:none}
+  .nav-open .rail:hover .rail-menu,.nav-open .rail:hover .rail-label span,.nav-open .rail:hover .rail-label em,
+  .nav-open .rail:hover .rail-mark svg{transform:none}
+}
+
+/* 产品区块：标题行（标题 + 查看全部同一基线 + 细线）→ 64px → 一行 4 张系列卡 */
+.series-block{padding-top:96px;padding-bottom:96px}
+.group-head{grid-column:2 / 12;display:flex;justify-content:space-between;align-items:baseline;gap:24px;
+  padding-bottom:22px;border-bottom:1px solid var(--hair-dark)}
+/* 区块标题和首屏标题同一副面孔：粗体、字距 .03em、行高收紧（display 的细体只留给品牌历程那类长句） */
+.group-head h2{font-weight:700;letter-spacing:.03em;line-height:1.16}
+/* 「查看全部产品线」照首屏标题旁的小字（航空拉杆包）：35px、中黑、字距 .04em */
+.center .display{font-size:35px;font-weight:500;letter-spacing:.04em;line-height:1.3}
+.group-head .eyebrow{margin-bottom:10px}
+.group-head .tlink{flex:none}
+.series-block .work.four{margin-top:64px}
+/* 系列卡：一行 4 张，放进 12 栏栅格里 */
+.work.four{grid-column:2 / 12;grid-template-columns:repeat(4,1fr);margin-top:96px}
+/* 说明：系列名为主、型号为辅（型号灰字小一档，没有就不占行）；图统一 4:5 */
+.work.four .capt{gap:6px}
+.work.four .title{font-size:22px;line-height:1.4}
+.work.four .client{font-size:13px;letter-spacing:.06em}
+.work.four .shot.is-photo{aspect-ratio:4 / 5}
+.work.four .overlay{justify-content:flex-end}
+.group-more{align-self:end;display:flex;justify-content:flex-end}
+
+/* 产品区块横幅：海报按原始比例 1920×600 放 */
+.group-banner{grid-column:2 / 12;margin-top:72px}
+.group-banner img{display:block;width:100%;height:auto}
+.group-banner + .work.four{margin-top:48px}
+/* 海报块（保证登机计划那块）：和首屏轮播同一套几何——横幅出血到石板两边、顶到石板顶，
+   文案和链接都在横幅里，四张系列卡的顶边压进横幅底边，整块咬合成一张海报 */
+.poster-block{padding-top:0;padding-bottom:90px}
+.poster-block .group-banner{grid-column:1 / -1;margin-top:0}
+.poster-block .work.four{margin-top:calc(-1 * var(--card-bite,40px));position:relative;z-index:1}
+/* 横幅上压文案：左起约 10%，垂直居中；字号跟横幅宽度走，
+   比例按设计稿量的：小标题≈2.8%、大标题≈4.7%、说明≈1.4% 横幅宽 */
+.group-banner.has-copy{position:relative;container-type:inline-size}
+.banner-copy{position:absolute;left:9.8%;top:50%;transform:translateY(-50%);color:var(--brand);letter-spacing:.02em}
+.banner-eyebrow{font-size:clamp(15px,2.8cqw,54px);font-weight:700;line-height:1.2}
+.banner-title{font-size:clamp(24px,4.7cqw,90px);font-weight:700;line-height:1.15;letter-spacing:.03em;margin-bottom:.3em}
+.banner-line{font-size:clamp(11px,1.45cqw,28px);font-weight:500;line-height:1.55}
+.banner-more{margin-top:clamp(12px,1.6cqw,30px)}
+.banner-more .tlink{font-size:clamp(12px,1.05cqw,18px)}
+/* 系列卡用场景图：按产品图 1200×1150 的比例，悬停同样缓推 */
+/* 场景图按 cover 裁进卡片 */
+.shot.is-photo{aspect-ratio:429 / 530}
+.shot.is-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.work a:hover .shot.is-photo img,.work a:focus-visible .shot.is-photo img{transition:transform 4s ease-out;transform:scale(1.08)}
+/* 灰底棚拍 ↔ 场景图：场景图叠在上面，平时透明，悬停 .45s 淡入；不用暗色遮罩、不盖字 */
+.shot.is-swap{background:#f2f2f2}
+.shot.is-swap img{position:absolute;inset:0}
+/* 场景图淡入的同时从 1.0 缓推到 1.06（4 秒，和站内其他图的悬停缓推同一个节奏）；棚拍图不动 */
+.shot.is-swap .scene{opacity:0;transform:scale(1);transition:opacity .45s ease}
+.work a:hover .shot.is-swap .scene,.work a:focus-visible .shot.is-swap .scene{opacity:1;transform:scale(1.06);transition:opacity .45s ease,transform 4s ease-out}
+.shot.is-swap::after{display:none}
+.work a:hover .shot.is-swap img:not(.scene),.work a:focus-visible .shot.is-swap img:not(.scene){transform:none;transition:none}
+
+/* 校园公益配图 */
+.imgaside .pic{position:relative}
+
+/* 校园公益小海报：1920×300 的横条，设计稿到位前用文字占位 */
+
+/* 关于我们：四列入口 */
+.services.four{grid-template-columns:repeat(4,1fr)}
+.services.four li a{font-size:18px;font-weight:300;line-height:2.2;letter-spacing:.02em;color:#cfcfcf;transition:color .2s ease}
+.services.four li a:hover,.services.four li a:focus-visible{color:#fff}
+
+/* 页脚社媒 */
+
+/* 右下角「顶部」按钮：半透明白色圆片，深浅两种石板上都看得清。
+   z-index 1：压在各块石板之上，但在抽屉(z:2)之下，手机上抽屉铺满时不会透出来 */
+.totop{
+  position:fixed;z-index:1;
+  right:calc(var(--inset-r) + 16px);bottom:calc(env(safe-area-inset-bottom,0px) + 32px);
+  width:68px;height:68px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  background:rgba(240,240,240,.9);color:#1c1c1c;
+  border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 14px rgba(0,0,0,.12);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  font-size:15px;font-weight:400;letter-spacing:.06em;line-height:1;
+  opacity:0;visibility:hidden;transform:translateY(8px);
+  transition:opacity .3s ease,transform .3s ease,visibility .3s,background .2s ease;
+}
+.totop.is-on{opacity:1;visibility:visible;transform:none}
+.totop svg{display:block;width:30px;height:12px;transition:transform .2s ease}
+.totop:hover{background:#fff}
+.totop:hover svg,.totop:focus-visible svg{transform:translateY(-2px)}
+
+@media (max-width:1100px){
+  /* 首屏·平板宽度：文案栏左边的留白只有 40px，两侧圆圈缩小并贴边，才不会挨着文字 */
+  .cside{width:36px;height:36px}
+  .cside.is-prev{left:8px}
+  .cside.is-next{right:8px}
+  .cside svg{width:18px;height:18px}
+  .habout{right:8px}
+  /* 这个宽度下海报裁得只剩右边一截，文案栏压在图上，手写标语不显示 */
+  .slogan-art{display:none}
+  .work.four{grid-template-columns:repeat(2,1fr)}
+  .services.four{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:760px){
+  .cside{width:34px;height:34px;top:73%}
+  .cside.is-prev{left:8px}
+  .cside.is-next{right:8px}
+  .cside svg{width:18px;height:18px}
+  .totop{right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:54px;height:54px;font-size:13px;gap:4px}
+  .totop svg{width:24px;height:10px}
+  /* 首屏轮播·手机：左文右图在窄屏上不成立，改成上文下图。
+     上半纯色底放文字，下半放照片（只露主体那一段），控件压在照片底部的淡色渐变上 */
+  .hero{padding:84px 0 28px}
+  .hero-top{margin-bottom:16px}
+  .cslides{min-height:520px}
+  .cslide.layout-left{align-items:start}
+  .h-copy{grid-column:2 / 12;gap:16px}
+  .h-title.is-compact{font-size:23px;letter-spacing:0;white-space:nowrap}
+  .cart.layout-left{background:var(--hero-pale)}
+  .cart.layout-left.tone-dark{background:#1f5a6e}
+  .cart.layout-left img{top:auto !important;height:54% !important;object-position:var(--pos-m,50% 50%)}
+  .cart.is-active img{transform:none;transition:none}
+  .cart.tone-light::after{background:linear-gradient(180deg,var(--hero-pale) 0,var(--hero-pale) 46%,rgba(228,248,255,0) 62%,rgba(228,248,255,0) 78%,rgba(228,248,255,.9) 100%)}
+  .cart.tone-dark::after{background:linear-gradient(180deg,#1f5a6e 0,#1f5a6e 46%,rgba(31,90,110,0) 62%,rgba(31,90,110,0) 78%,rgba(31,90,110,.85) 100%)}
+  .h-stats{gap:14px 14px}
+  .h-stats li{gap:8px}
+  .h-stat-icon{width:30px;height:28px}
+  .h-stat-num b{font-size:19px}
+  .h-stat-label{font-size:13px}
+  .h-stat-en,.slogan-art{display:none}
+  .cart-strip{bottom:132px;max-height:none}
+  .strip-title{top:auto;bottom:100%;left:0;right:0;height:auto;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:14px;padding:0 20px 22px}
+  .strip-title .h-title{font-size:30px;letter-spacing:.04em;white-space:normal;flex-wrap:wrap;gap:6px 14px}
+  .strip-title .h-title small{font-size:.56em}
+  .rail-menu{margin-top:30px}
+  .rail-mark{margin:0 0 26px}
+  .rail-label{gap:16px}
+  .rail-label::before,.rail-label::after{height:40px}
+  .rail-label span{font-size:14px;letter-spacing:.42em}
+  .rail-label em{display:none}
+  .rail-mark svg{width:28px;height:auto}
+  .hero-top{flex-wrap:nowrap;gap:12px}
+  .wordmark .lockup{width:146px}
+  /* 手机上横幅只有 100 来 px 高，文案压不进去：改放在图下面；卡片也不再压横幅 */
+  .banner-copy{position:static;transform:none;margin:14px var(--gut) 0}
+  .banner-more{margin-top:12px}
+  .poster-block{padding-bottom:var(--pad-y)}
+  .poster-block .work.four{margin-top:36px}
+  .banner-eyebrow{font-size:14px}
+  .banner-title{font-size:24px;margin-bottom:.2em}
+  .banner-line{font-size:13px}
+  .work.four{grid-template-columns:repeat(2,1fr);column-gap:16px;row-gap:36px;margin-top:56px}
+  .work.four a{gap:14px}
+  .work.four .title{font-size:17px}
+  .work.four .client{font-size:12px}
+  .services.four{grid-template-columns:1fr}
+  .group-more{justify-content:flex-start;margin-top:28px}
+  .group-head{flex-direction:column;align-items:flex-start;gap:14px;padding-bottom:16px}
+  .series-block .work.four{margin-top:36px}
+  .series-block{padding-bottom:var(--pad-y)}
+}
+/* 小屏手机(≤380px)：字标行和校园公益那张的标题、四个数字放不下，整体收一号 */
+@media (max-width:380px){
+  /* 字标和右上角的「关于我们」在一条线上，屏太窄会碰到：字标按屏宽缩，按钮收紧 */
+  .wordmark .lockup{width:min(146px,31vw)}
+  .habout{height:34px;padding:0 12px;gap:6px;font-size:12px}
+  .habout svg{width:16px}
+  .h-title.is-compact{font-size:min(23px,6.3vw)}
+  .h-stats{gap:12px 8px}
+  .h-stats li{gap:6px}
+  .h-stat-icon{width:24px;height:22px}
+  .h-stat-num b{font-size:min(19px,5vw)}
+  .h-stat-num small{font-size:10px;margin-left:1px}
+  .h-stat-label{font-size:12px;letter-spacing:.02em}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .totop,.totop svg{transition:none}
+  .cside,.cside svg{transition:none}
+  .pslide .pshot{transition:none;transform:none}
+  .habout,.habout svg{transition:none}
+  .hero,.wordmark{transition:none}
+  .strip-title{transition:none;transform:none}
+  .rail::before,.rail-menu,.rail-label span,.rail-label em,.rail-mark svg{transition:none}
+  .cart.is-active img{transition:none;transform:none}
 }

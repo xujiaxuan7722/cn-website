@@ -1,8 +1,10 @@
+import Link from 'next/link';
+
 // 3 · 品牌片(由原型原样迁移,服务端组件)
 export default function Reel() {
   return (
     <section className="slab flush" data-label="品牌">
-      <a className="reel" href="#products" aria-label="播放品牌片">
+      <Link className="reel" href="/#air-carrier" aria-label="播放品牌片">
         <svg className="art" viewBox="0 0 1340 712" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <rect width="1340" height="712" fill="#121212" />
           <rect x="0" y="470" width="1340" height="242" fill="#1c1c1c" />
@@ -17,7 +19,7 @@ export default function Reel() {
           </span>
           观看品牌片
         </span>
-      </a>
+      </Link>
     </section>
   );
 }
