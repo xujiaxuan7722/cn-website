@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import LogoMark from '@/components/LogoMark';
-import { NAV_PRIMARY, NAV_SECONDARY, RAIL_EN } from '@/content/site';
+import { NAV_PRIMARY, NAV_SECONDARY, RAIL_EN, COMPANY } from '@/content/site';
 
 // 书脊（左侧竖条）+ 抽屉菜单。全站每一页共用，挂在根布局里。
 // 书脊自上而下：菜单按钮 → 当前区块标签 → 品牌标。
@@ -166,10 +166,14 @@ export default function SiteChrome() {
             </Link>
           ))}
         </div>
-        <div className="nav-secondary">
-          {NAV_SECONDARY.map((item) => (
-            <Link key={item.label} href={item.href}>{item.label}</Link>
-          ))}
+        {/* 次级链接沉到抽屉底部，中间的空白是留白不是剩余 */}
+        <div className="nav-foot">
+          <div className="nav-secondary">
+            {NAV_SECONDARY.map((item) => (
+              <Link key={item.label} href={item.href}>{item.label}</Link>
+            ))}
+          </div>
+          <p className="nav-copy">{COMPANY.name} · 始于 2001</p>
         </div>
       </nav>
     </>

@@ -87,7 +87,7 @@ export default function Hero() {
       </div>
 
       {/* 右上角「关于我们」：不在字标那一行里，单独贴着海报右上角，右缘和右侧圆圈对齐 */}
-      <Link className="habout" href="/#about">
+      <Link className="habout" href="/#about" onClick={(e) => goSection(e, '/#about')}>
         关于我们
         <svg viewBox="0 0 24 12" aria-hidden="true">
           <path d="M1 6h21M17 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />

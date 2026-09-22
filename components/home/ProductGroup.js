@@ -45,7 +45,7 @@ export default function ProductGroup({ group, artOffset }) {
           <Image src={group.banner.image} alt={group.banner.alt} sizes="(max-width: 760px) 100vw, 86vw" placeholder="blur" />
         </div>
       )}
-      <SeriesGrid items={group.series} href={href} label={group.label} artOffset={artOffset} />
+      <SeriesGrid items={group.series} href={href} hrefBase="/series/" label={group.label} artOffset={artOffset} />
     </section>
   );
 }

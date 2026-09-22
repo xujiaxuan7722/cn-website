@@ -121,12 +121,6 @@ export const HERO_SLIDES = [
   },
 ];
 
-// 顶部公告条
-export const ANNOUNCEMENTS = [
-  { text: '星选系列航空包获南方航空官方推荐，已上线南航商城', href: '/#air-carrier', label: '查看航空包' },
-  { text: '国内首倡并践行「保证登机计划」，与西部航空、南方航空合作', href: '/#air-carrier', label: '了解计划' },
-  { text: '宠适之家校园公益合作高校达 800 所', href: '/#campus', label: '了解公益' },
-];
 
 // 产品系列首页展示：三个主栏目，各 4 个系列（栏目规划原文）
 export const PRODUCT_GROUPS = [
@@ -138,10 +132,10 @@ export const PRODUCT_GROUPS = [
     tone: 'paper',
     // 系列卡：平时是灰底 45° 棚拍（studio），悬停换成带人的场景图（image）
     series: [
-      { name: '星选系列', note: 'DHCE1980 系列', studio: studioXingxuan, image: seriesXingxuan, alt: '机场航站楼里，女士单肩背着宠适星选系列航空包，猫从包里探头' },
-      { name: '飞屋系列', note: '航空拉杆包系列', studio: studioFeiwu, image: seriesFeiwu, alt: '停机坪旁，女士拉着宠适飞屋系列航空拉杆包，柯基坐在包里' },
-      { name: '乘风系列', note: 'DCC1800 系列', studio: studioChengfeng, image: seriesChengfeng, alt: '城市街头，女士斜挎宠适乘风系列航空包，猫从透气网窗望出来' },
-      { name: '云游系列', note: '航空背包系列', studio: studioYunyou, image: seriesYunyou, alt: '城市天际线前，女士背着宠适云游系列航空背包，猫从背包顶探出头' },
+      { name: '星选系列', slug: 'xingxuan', note: 'DHCE1980 系列', studio: studioXingxuan, image: seriesXingxuan, alt: '机场航站楼里，女士单肩背着宠适星选系列航空包，猫从包里探头' },
+      { name: '飞屋系列', slug: 'feiwu', note: '航空拉杆包系列', studio: studioFeiwu, image: seriesFeiwu, alt: '停机坪旁，女士拉着宠适飞屋系列航空拉杆包，柯基坐在包里' },
+      { name: '乘风系列', slug: 'chengfeng', note: 'DCC1800 系列', studio: studioChengfeng, image: seriesChengfeng, alt: '城市街头，女士斜挎宠适乘风系列航空包，猫从透气网窗望出来' },
+      { name: '云游系列', slug: 'yunyou', note: '航空背包系列', studio: studioYunyou, image: seriesYunyou, alt: '城市天际线前，女士背着宠适云游系列航空背包，猫从背包顶探出头' },
     ],
   },
   {
@@ -150,10 +144,10 @@ export const PRODUCT_GROUPS = [
     title: ['带宠出行'],
     tone: 'paper',
     series: [
-      { name: '美拉德系列', note: 'DBCD047 系列', studio: studioMeilade, image: sceneMeilade, alt: '海边，女士背着宠适美拉德系列宠物背包，猫从背包顶探出头' },
-      { name: '学院π系列', note: 'DBCD054 系列', studio: studioXueyuan, image: sceneXueyuan, alt: '街头斑马线上，女士背着宠适学院π系列绿色宠物背包' },
-      { name: '牛仔系列', note: '', studio: studioNiuzai, image: sceneNiuzai, alt: '女士手提宠适牛仔系列宠物包，小狗从包侧透气窗望出来' },
-      { name: '车载沙发系列', note: '', studio: studioChezai, image: sceneChezai, alt: '汽车后座上，白色小狗坐在宠适车载沙发里' },
+      { name: '美拉德系列', slug: 'meilade', note: 'DBCD047 系列', studio: studioMeilade, image: sceneMeilade, alt: '海边，女士背着宠适美拉德系列宠物背包，猫从背包顶探出头' },
+      { name: '学院π系列', slug: 'xueyuanpi', note: 'DBCD054 系列', studio: studioXueyuan, image: sceneXueyuan, alt: '街头斑马线上，女士背着宠适学院π系列绿色宠物背包' },
+      { name: '牛仔系列', slug: 'niuzai', note: '', studio: studioNiuzai, image: sceneNiuzai, alt: '女士手提宠适牛仔系列宠物包，小狗从包侧透气窗望出来' },
+      { name: '车载沙发系列', slug: 'chezai', note: '', studio: studioChezai, image: sceneChezai, alt: '汽车后座上，白色小狗坐在宠适车载沙发里' },
     ],
   },
   {
@@ -162,10 +156,10 @@ export const PRODUCT_GROUPS = [
     title: ['宠物家居'],
     tone: 'paper',
     series: [
-      { name: '软窝系列', note: '', studio: studioRuanwo, image: sceneRuanwo, alt: '客厅里，柯基趴在宠适软窝系列宠物窝里' },
-      { name: '猫窗台系列', note: '', studio: studioChuangtai, image: sceneChuangtai, alt: '两只猫坐在窗边的宠适猫窗台上看风景' },
-      { name: '多功能猫柜', note: '', studio: studioMaogui, image: sceneMaogui, alt: '橘猫从宠适白色多功能猫柜里走出来' },
-      { name: '宠适猫砂', note: '', studio: studioMaosha, image: sceneMaosha, alt: '猫站在猫砂盆边，旁边放着宠适猫砂' },
+      { name: '软窝系列', slug: 'ruanwo', note: '', studio: studioRuanwo, image: sceneRuanwo, alt: '客厅里，柯基趴在宠适软窝系列宠物窝里' },
+      { name: '猫窗台系列', slug: 'maochuangtai', note: '', studio: studioChuangtai, image: sceneChuangtai, alt: '两只猫坐在窗边的宠适猫窗台上看风景' },
+      { name: '多功能猫柜', slug: 'maogui', note: '', studio: studioMaogui, image: sceneMaogui, alt: '橘猫从宠适白色多功能猫柜里走出来' },
+      { name: '宠适猫砂', slug: 'maosha', note: '', studio: studioMaosha, image: sceneMaosha, alt: '猫站在猫砂盆边，旁边放着宠适猫砂' },
     ],
   },
 ];

@@ -1,5 +1,4 @@
 import Hero from '@/components/home/Hero';
-import Band from '@/components/home/Band';
 import Reel from '@/components/home/Reel';
 import ProductGroup from '@/components/home/ProductGroup';
 import AllProducts from '@/components/home/AllProducts';
@@ -13,7 +12,6 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <Band />
       <Reel />
       {PRODUCT_GROUPS.map((group, i) => (
         <ProductGroup key={group.id} group={group} artOffset={i * 2} />
