@@ -1,25 +1,77 @@
-import Link from 'next/link';
+'use client';
 
-// 3 · 品牌片(由原型原样迁移,服务端组件)
+import { useEffect, useRef, useState } from 'react';
+import { BRAND_FILM } from '@/content/site';
+import usePrefersReducedMotion from '@/components/hooks/usePrefersReducedMotion';
+import poster from '@/public/videos/brand-film-poster.jpg';
+
+// 3 · 品牌片：滚到这一块就静音循环播放（浏览器只允许静音自动播放），像一张会动的封面；
+// 中间不放按钮，点视频本身就进全屏、开声音、出进度条，退出全屏回到静音循环。
+// 视频文件不进仓库（.gitignore *.mp4），上线换 CDN 只改 content/site.js 的 BRAND_FILM.src。
 export default function Reel() {
+  const reduce = usePrefersReducedMotion();
+  const box = useRef(null);
+  const video = useRef(null);
+  const [watching, setWatching] = useState(false);
+
+  // 进视口播、出视口停；开了"减少动效"就不自动播
+  useEffect(() => {
+    const v = video.current;
+    if (!v || reduce || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) v.play().catch(() => {});
+      else if (!document.fullscreenElement) v.pause();
+    }, { threshold: 0.35 });
+    io.observe(v);
+    return () => io.disconnect();
+  }, [reduce]);
+
+  // 退出全屏 → 回到静音循环
+  useEffect(() => {
+    const onChange = () => {
+      if (document.fullscreenElement) return;
+      const v = video.current;
+      if (!v) return;
+      v.muted = true;
+      v.controls = false;
+      v.loop = true;
+      setWatching(false);
+      v.play().catch(() => {});
+    };
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
+
+  const watch = async () => {
+    const v = video.current;
+    if (!v) return;
+    v.muted = false;
+    v.controls = true;
+    v.loop = false;
+    v.currentTime = 0;
+    setWatching(true);
+    try { await (box.current.requestFullscreen?.() ?? v.requestFullscreen?.()); } catch { /* 不支持全屏就原地播 */ }
+    v.play().catch(() => {});
+  };
+
   return (
     <section className="slab flush" data-label="品牌">
-      <Link className="reel" href="/#air-carrier" aria-label="播放品牌片">
-        <svg className="art" viewBox="0 0 1340 712" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <rect width="1340" height="712" fill="#121212" />
-          <rect x="0" y="470" width="1340" height="242" fill="#1c1c1c" />
-          <circle cx="352" cy="300" r="176" fill="#242424" />
-          <rect x="838" y="124" width="332" height="332" fill="#1e1e1e" />
-          <path d="M838 456h332" stroke="#3a3a3a" strokeWidth="1" />
-          <path d="M176 470h1000" stroke="#2e2e2e" strokeWidth="1" />
-        </svg>
-        <span className="reel-play">
-          <span className="ring">
-            <svg viewBox="0 0 12 14" width="12" height="14" fill="#fff" aria-hidden="true"><path d="M0 0l12 7-12 7z" /></svg>
-          </span>
-          观看品牌片
-        </span>
-      </Link>
+      <div ref={box} className={`reel${watching ? ' is-watching' : ''}`}>
+        <video
+          ref={video}
+          className="reel-video"
+          src={BRAND_FILM.src}
+          poster={poster.src}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-label={BRAND_FILM.alt}
+          title={watching ? undefined : `点击全屏观看${BRAND_FILM.title}`}
+          onClick={watching ? undefined : watch}
+          onEnded={() => { if (document.fullscreenElement) document.exitFullscreen?.(); }}
+        />
+      </div>
     </section>
   );
 }

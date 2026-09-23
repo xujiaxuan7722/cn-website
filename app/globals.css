@@ -394,8 +394,13 @@ br.pc{display:inline}
   transition:clip-path .4s ease-out;
 }
 .reel.wipe{clip-path:polygon(0 0,100% 0,100% 0,0 0)}
-.reel svg.art{position:absolute;inset:0;width:100%;height:100%}
-.reel-play{position:relative;z-index:2;display:flex;align-items:center;gap:16px;color:#fff;font-size:16px;font-weight:500;letter-spacing:.14em}
+/* 静音循环时视频铺满整块（cover），上面压一层薄暗让白字看得清；全屏观看时去掉暗层、按比例显示 */
+.reel-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;cursor:pointer}
+.reel.is-watching .reel-video{cursor:default}
+.reel:fullscreen{background:#000}
+.reel:fullscreen .reel-video{object-fit:contain}
+.reel-play{position:relative;z-index:2;display:flex;align-items:center;gap:16px;color:#fff;font-size:16px;font-weight:500;letter-spacing:.14em;padding:24px;cursor:pointer}
+.reel-play small{font-size:13px;letter-spacing:.08em;opacity:.7;font-variant-numeric:tabular-nums}
 .reel-play span.ring{
   width:62px;height:62px;border:1px solid rgba(255,255,255,.75);border-radius:999rem;
   display:grid;place-items:center;transition:transform .4s ease;

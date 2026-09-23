@@ -113,8 +113,8 @@ export const HERO_SLIDES = [
     stats: [
       { icon: 'campus', num: '800+', unit: '所', label: '合作校园', en: 'Partnered Campus' },
       { icon: 'stray', num: '100,000+', unit: '只', label: '受益小流浪', en: 'Assisted Strays' },
-      { icon: 'funds', num: '300W+', unit: '元', label: '资金投入', en: 'Funds Invested' },
-      { icon: 'supplies', num: '10,000+', unit: '件', label: '捐助物资', en: 'Supplies Donated' },
+      { icon: 'funds', num: '350W+', unit: '元', label: '资金投入', en: 'Funds Invested' },
+      { icon: 'supplies', num: '9,000+', unit: '件', label: '捐助物资', en: 'Supplies Donated' },
     ],
     slogan: ['每一个毛孩子', '都值得被呵护。'],
     cta: { href: '/#campus', label: '了解校园公益' },
@@ -229,9 +229,9 @@ export const ABOUT = {
   // 四格：中文标题 + 英文小注 + 子栏目；href 是整格的去向（子页做好后改这里）
   columns: [
     { title: '品牌故事', en: 'Brand Story', href: '/#about', links: ['发展历程', '创始人', '团队风采', '企业荣誉', '品牌资质', '宣传片', '下载品牌手册'] },
-    { title: '媒体报道', en: 'Press', href: '/#about', links: ['新闻报道'] },
+    { title: '媒体报道', en: 'Media Coverage', href: '/#about', links: ['新闻报道'] },
     { title: '答疑解惑', en: 'FAQ', href: '/#about', links: ['常见问题'] },
-    { title: '联系我们', en: 'Contact', href: '/#about', links: ['社媒一览', '客服渠道', '加入我们'] },
+    { title: '联系我们', en: 'Contact', href: '/#about', links: ['客服渠道', '加入我们'] },
   ],
 };
 

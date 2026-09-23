@@ -36,6 +36,14 @@ export const RAIL_EN = {
   联系我们: 'Contact',
 };
 
+// 品牌片。src 现在指向本地 1080p 压缩版（不入库，见 .gitignore *.mp4）；上线时换成 CDN 地址即可
+export const BRAND_FILM = {
+  title: '吉信德 SUNNYPET 宣传片 2024',
+  src: '/videos/brand-film-1080p.mp4',
+  duration: '3′17″',
+  alt: '航拍的吉信德 SUNNYPET 厂区，玻璃幕墙办公楼与厂房',
+};
+
 // 页脚用的公司信息与法务。地址 / 电话 / 邮箱 / 备案号材料里没有，空着的不显示；备案号上线前必须填
 export const COMPANY = {
   name: '厦门吉信德电子商务有限公司',
