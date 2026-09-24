@@ -54,6 +54,32 @@ content/
 - 上线前设环境变量 `SITE_URL=https://正式域名`（不设则为 `http://localhost:3200`）；sitemap、robots、canonical、分享卡片、结构化数据里的绝对地址都由它拼出，站点信息集中在 `content/seo.ts`。
 - 文案和图片只改 `content/` 里的数据文件，字段以 `content/types.ts` 为准；少填或填错字段，`npm run typecheck` 会报出来。
 
+## 页面截图
+
+电脑端 1440 宽整页截图（2026-09-24），手机端 390 宽。图片在 `docs/screenshots/`，点击看大图。
+
+### 首页
+
+<a href="docs/screenshots/home-pc.jpg"><img src="docs/screenshots/home-pc.jpg" width="560" alt="首页 电脑端"></a> <a href="docs/screenshots/home-m.jpg"><img src="docs/screenshots/home-m.jpg" width="180" alt="首页 手机端"></a>
+
+### 全部产品 `/products`
+
+<a href="docs/screenshots/products-pc.jpg"><img src="docs/screenshots/products-pc.jpg" width="560" alt="全部产品 电脑端"></a> <a href="docs/screenshots/products-m.jpg"><img src="docs/screenshots/products-m.jpg" width="180" alt="全部产品 手机端"></a>
+
+### 品牌故事 `/brand-story`
+
+<a href="docs/screenshots/brand-story-pc.jpg"><img src="docs/screenshots/brand-story-pc.jpg" width="560" alt="品牌故事 电脑端"></a> <a href="docs/screenshots/brand-story-m.jpg"><img src="docs/screenshots/brand-story-m.jpg" width="180" alt="品牌故事 手机端"></a>
+
+### 系列详情页 `/series/<slug>`（12 个）
+
+手机端示例（星选系列）：<a href="docs/screenshots/series-xingxuan-m.jpg">series-xingxuan-m.jpg</a>
+
+<table>
+<tr><td align="center"><a href="docs/screenshots/series-xingxuan-pc.jpg"><img src="docs/screenshots/series-xingxuan-pc.jpg" width="200" alt="星选系列"></a><br><sub>星选系列 · <code>/series/xingxuan</code></sub></td><td align="center"><a href="docs/screenshots/series-feiwu-pc.jpg"><img src="docs/screenshots/series-feiwu-pc.jpg" width="200" alt="飞屋系列"></a><br><sub>飞屋系列 · <code>/series/feiwu</code></sub></td><td align="center"><a href="docs/screenshots/series-chengfeng-pc.jpg"><img src="docs/screenshots/series-chengfeng-pc.jpg" width="200" alt="乘风系列"></a><br><sub>乘风系列 · <code>/series/chengfeng</code></sub></td><td align="center"><a href="docs/screenshots/series-yunyou-pc.jpg"><img src="docs/screenshots/series-yunyou-pc.jpg" width="200" alt="云游系列"></a><br><sub>云游系列 · <code>/series/yunyou</code></sub></td></tr>
+<tr><td align="center"><a href="docs/screenshots/series-meilade-pc.jpg"><img src="docs/screenshots/series-meilade-pc.jpg" width="200" alt="美拉德系列"></a><br><sub>美拉德系列 · <code>/series/meilade</code></sub></td><td align="center"><a href="docs/screenshots/series-xueyuanpi-pc.jpg"><img src="docs/screenshots/series-xueyuanpi-pc.jpg" width="200" alt="学院π系列"></a><br><sub>学院π系列 · <code>/series/xueyuanpi</code></sub></td><td align="center"><a href="docs/screenshots/series-niuzai-pc.jpg"><img src="docs/screenshots/series-niuzai-pc.jpg" width="200" alt="牛仔系列"></a><br><sub>牛仔系列 · <code>/series/niuzai</code></sub></td><td align="center"><a href="docs/screenshots/series-chezai-pc.jpg"><img src="docs/screenshots/series-chezai-pc.jpg" width="200" alt="车载沙发系列"></a><br><sub>车载沙发系列 · <code>/series/chezai</code></sub></td></tr>
+<tr><td align="center"><a href="docs/screenshots/series-ruanwo-pc.jpg"><img src="docs/screenshots/series-ruanwo-pc.jpg" width="200" alt="软窝系列"></a><br><sub>软窝系列 · <code>/series/ruanwo</code></sub></td><td align="center"><a href="docs/screenshots/series-maochuangtai-pc.jpg"><img src="docs/screenshots/series-maochuangtai-pc.jpg" width="200" alt="猫窗台系列"></a><br><sub>猫窗台系列 · <code>/series/maochuangtai</code></sub></td><td align="center"><a href="docs/screenshots/series-maogui-pc.jpg"><img src="docs/screenshots/series-maogui-pc.jpg" width="200" alt="多功能猫柜"></a><br><sub>多功能猫柜 · <code>/series/maogui</code></sub></td><td align="center"><a href="docs/screenshots/series-maosha-pc.jpg"><img src="docs/screenshots/series-maosha-pc.jpg" width="200" alt="宠适猫砂"></a><br><sub>宠适猫砂 · <code>/series/maosha</code></sub></td></tr>
+</table>
+
 ## 进度
 
 - [x] M1 由单文件原型 1:1 迁移到 Next 工程
