@@ -45,6 +45,7 @@ content/
 - 字体经 `next/font` 在构建时下载并自托管，运行时不请求 Google Fonts。
 - 视频不进仓库，放 CDN；页面只引用地址。
 - URL 用英文。
+- 上线前设环境变量 `SITE_URL=https://正式域名`（不设则为 `http://localhost:3200`）；sitemap、robots、canonical、分享卡片、结构化数据里的绝对地址都由它拼出，站点信息集中在 `content/seo.ts`。
 - 文案和图片只改 `content/` 里的数据文件，字段以 `content/types.ts` 为准；少填或填错字段，`npm run typecheck` 会报出来。
 
 ## 进度
@@ -55,5 +56,6 @@ content/
 - [x] M2.2 品牌片接入首页
 - [x] 迁移 TypeScript；手机紧凑版（手机保留电脑版构图，整体缩小）
 - [ ] M3 关于我们各子页（历程 / 荣誉 / 资质 / 社媒 / 创始人）
-- [ ] M4 SEO / GEO：每页 metadata、JSON-LD、sitemap、robots
+- [x] M4 基础：每页 metadata（描述、canonical、Open Graph）、Organization / WebSite / 面包屑 JSON-LD、sitemap、robots
+- [ ] M4 其余：Product / FAQPage / VideoObject 结构化数据（等产品资料、FAQ、宣传片上传日期）
 - [ ] M5 系列页与产品详情页（待产品数据）

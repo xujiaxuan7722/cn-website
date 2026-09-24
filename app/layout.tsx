@@ -5,6 +5,8 @@ import SiteChrome from '@/components/SiteChrome';
 import Reveal from '@/components/Reveal';
 import Footer from '@/components/Footer';
 import BackToTop from '@/components/BackToTop';
+import JsonLd from '@/components/JsonLd';
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, DEFAULT_OG_IMAGE, ORGANIZATION, WEBSITE } from '@/content/seo';
 import './globals.css';
 
 // 拉丁字形走 Hanken，汉字回落到思源黑体。构建时下载并自托管，运行时不请求 Google。
@@ -22,8 +24,20 @@ const notoSansSC = Noto_Sans_SC({
   preload: false,
 });
 
+// 子页只给自己的标题，模板自动补「 · 宠适」；Open Graph 各页没写的沿用这里
 export const metadata: Metadata = {
-  title: '宠适',
+  metadataBase: new URL(SITE_URL),
+  title: { default: '宠适 PETSFIT · 航空包 · 带宠出行 · 宠物家居', template: '%s · 宠适' },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'zh_CN',
+    siteName: SITE_NAME,
+    url: '/',
+    images: [DEFAULT_OG_IMAGE],
+  },
 };
 
 export const viewport: Viewport = {
@@ -40,6 +54,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       data-scroll-behavior="smooth"
     >
       <body>
+        <JsonLd data={ORGANIZATION} />
+        <JsonLd data={WEBSITE} />
         <SiteChrome />
         <div className="stage">
           {children}

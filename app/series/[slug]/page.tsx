@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { SERIES, findSeries } from '@/content/series';
 import SeriesGrid from '@/components/SeriesGrid';
+import JsonLd from '@/components/JsonLd';
+import { SITE_URL } from '@/content/seo';
 
 export function generateStaticParams() {
   return SERIES.map((s) => ({ slug: s.slug }));
@@ -12,7 +14,19 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<'/series/[slug]'>): Promise<Metadata> {
   const { slug } = await params;
   const s = findSeries(slug);
-  return { title: s ? `${s.name} · ${s.group.label} · 宠适` : '宠适' };
+  if (!s) return {};
+  // 有定位文案的用文案，没有的先给一句栏目归属，等材料补齐自动替换
+  const description = s.tagline
+    ? `宠适${s.name}：${s.tagline}。${s.points.join('；')}。`
+    : `宠适${s.group.label}·${s.name}${s.note ? `（${s.note}）` : ''}。`;
+  // canonical 不带 ?layout=，试排版的三种链接都算同一页
+  const path = `/series/${s.slug}`;
+  return {
+    title: `${s.name} · ${s.group.label}`,
+    description,
+    alternates: { canonical: path },
+    openGraph: { url: path, title: `${s.name} · 宠适${s.group.label}`, description, images: [{ url: s.scene.src, width: s.scene.width, height: s.scene.height, alt: s.alt }] },
+  };
 }
 
 // 系列详情页。三种头图排版用 ?layout=a|b|c 切换（试排版用，定稿后只留一种）：
@@ -23,6 +37,16 @@ export default async function SeriesPage({ params, searchParams }: PageProps<'/s
   const s = findSeries(slug);
   if (!s) notFound();
   const L = layout === 'b' || layout === 'c' ? layout : 'a';
+
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: s.group.label, item: `${SITE_URL}/#${s.group.id}` },
+      { '@type': 'ListItem', position: 3, name: s.name, item: `${SITE_URL}/series/${s.slug}` },
+    ],
+  };
 
   const crumbs = (
     <nav className="crumbs" aria-label="位置">
@@ -45,6 +69,7 @@ export default async function SeriesPage({ params, searchParams }: PageProps<'/s
 
   return (
     <>
+      <JsonLd data={breadcrumb} />
       {/* 头图区 */}
       {L === 'a' && (
         <section className="slab paper grid sp-hero sp-a" data-label={s.group.label}>
