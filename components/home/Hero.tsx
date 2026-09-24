@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent, ReactNode, TouchEvent } from 'react';
 import Image from 'next/image';
 import BrandLockup from '@/components/BrandLockup';
+import CarouselNav from '@/components/CarouselNav';
 import usePrefersReducedMotion from '@/components/hooks/usePrefersReducedMotion';
 import { HERO_SLIDES } from '@/content/home';
 import type { StatIconName } from '@/content/types';
@@ -12,9 +13,8 @@ import type { StatIconName } from '@/content/types';
 const SLIDES = HERO_SLIDES;
 
 const COUNT = SLIDES.length;
-const pad = (n: number) => String(n).padStart(2, '0');
 
-// 1 · 首屏轮播：7s 一张，任一次手动操作后永久停止自动播放。
+// 1 · 首屏轮播：3s 一张（09-24 用户定，原 7s），任一次手动操作后永久停止自动播放。
 // 每一张的文字都在服务端输出到 HTML 里，浏览器里只切换 class。
 export default function Hero() {
   const reduce = usePrefersReducedMotion();
@@ -39,7 +39,7 @@ export default function Hero() {
     const t = setTimeout(() => {
       setPrev(cur);
       setCur((cur + 1) % COUNT);
-    }, 7000);
+    }, 3000);
     return () => clearTimeout(t);
   }, [cur, autoOn, paused]);
 
@@ -87,14 +87,6 @@ export default function Hero() {
           <BrandLockup />
         </div>
       </div>
-
-      {/* 右上角「关于我们」：不在字标那一行里，单独贴着海报右上角，右缘和右侧圆圈对齐 */}
-      <Link className="habout" href="/#about" onClick={(e) => goSection(e, '/#about')}>
-        关于我们
-        <svg viewBox="0 0 24 12" aria-hidden="true">
-          <path d="M1 6h21M17 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </Link>
 
       <div className="cbg">
         {SLIDES.map((s, i) => {
@@ -224,41 +216,13 @@ export default function Hero() {
         })}
       </div>
 
-      {/* 海报左右两侧的上一张 / 下一张 */}
-      <button className="cside is-prev" aria-label="上一张" onClick={() => manual((cur + COUNT - 1) % COUNT)}>
-        <Chevron dir="left" />
-      </button>
-      <button className="cside is-next" aria-label="下一张" onClick={() => manual((cur + 1) % COUNT)}>
-        <Chevron dir="right" />
-      </button>
-
+      {/* 翻页控件（09-24 照 earthrated.com 首屏）：海报底部居中一组——上一张圆钮、「3 / 4」、下一张圆钮。
+          原来两侧的细线箭头和左下角的进度条去掉了。下面这一行 .cnav 留着当占位，首屏高度才不变 */}
+      <CarouselNav cur={cur} count={COUNT} onPrev={() => manual((cur + COUNT - 1) % COUNT)} onNext={() => manual((cur + 1) % COUNT)} />
       <div className="grid">
-        <div className="cnav">
-          <span className="cnum"><b id="cnum">{pad(cur + 1)}</b> / {pad(COUNT)}</span>
-          <div className="cbars" id="cbars">
-            {SLIDES.map((s, i) => (
-              <button
-                key={s.id}
-                className={`cbar${i === cur ? (autoOn ? ' is-on' : ' is-held') : ''}`}
-                data-go={i}
-                aria-label={`第 ${i + 1} 张`}
-                onClick={() => manual(i)}
-              >
-                <i></i>
-              </button>
-            ))}
-          </div>
-        </div>
+        <div className="cnav" aria-hidden="true"></div>
       </div>
     </section>
-  );
-}
-
-function Chevron({ dir }: { dir: 'left' | 'right' }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d={dir === 'left' ? 'M14.5 5l-7 7 7 7' : 'M9.5 5l7 7-7 7'} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }
 

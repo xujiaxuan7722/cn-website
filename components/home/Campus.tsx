@@ -18,12 +18,18 @@ export default function Campus() {
         <Ticker items={c.news} />
       </section>
 
-      <section className="slab paper grid series-block" data-label="校园公益">
-        <div className="group-head" data-reveal="">
-          <div><h2 className="display">校园公益猫屋</h2></div>
-          <Link className="tlink" href="/#campus">查看木制产品<i className="arrow sm" aria-hidden="true"></i></Link>
+      {/* 猫屋卡：和上面「宠适产品」同一套样式（大标题 + 一句说明、系列名蓝绿粗体、圆角图、底部胶囊按钮） */}
+      <section className="slab grid ptabs houses" data-label="校园公益">
+        <div className="ptabs-head" data-reveal="">
+          <div>
+            <h2 className="ptabs-title">{c.housesTitle}</h2>
+            <p className="ptabs-lede">{c.housesLede}</p>
+          </div>
         </div>
         <SeriesGrid items={c.houses} href="/#campus" label="木制产品" artOffset={4} />
+        <div className="ptabs-more">
+          <Link className="pill-btn" href="/products?cat=houses">查看全部产品</Link>
+        </div>
       </section>
     </>
   );

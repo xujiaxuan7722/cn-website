@@ -36,6 +36,12 @@ export interface BrandFilm {
   src: string;
   duration: string;
   alt: string;
+  /** 首页品牌片卡片左侧的文字：小标签、标题、正文、底部按钮 */
+  eyebrow: string;
+  headline: string;
+  lede: string;
+  motto: string;
+  cta: string;
 }
 
 export interface Company {
@@ -50,6 +56,14 @@ export interface Legal {
   icp: string;
   /** 公安联网备案号 */
   police: string;
+}
+
+/* ---------------- 信任条 ---------------- */
+
+/** 首屏下面那条滚动的信任条，一项一句；strong 是句首要突出的数字 */
+export interface TrustItem {
+  strong?: string;
+  text: string;
 }
 
 /* ---------------- 首屏轮播 ---------------- */
@@ -148,6 +162,12 @@ export interface ProductGroup {
   series: SeriesCard[];
 }
 
+/** 首页产品区（三条产品线合成一块，分页切换）的标题 */
+export interface ProductsIntro {
+  title: string;
+  lede: string;
+}
+
 /* ---------------- 校园公益 ---------------- */
 
 export interface CampusSlide {
@@ -179,6 +199,8 @@ export interface Campus {
   lede: string;
   stats: Stat[];
   news: NewsItem[];
+  housesTitle: string;
+  housesLede: string;
   houses: SeriesCard[];
 }
 

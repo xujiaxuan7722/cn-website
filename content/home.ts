@@ -1,6 +1,6 @@
 // 首页内容。文字只取自已有材料：首屏海报设计内容（pptx）、发展历程、栏目规划。
 // 材料里没有的（系列介绍、产品卖点）留空，等文案补齐，不自己编。
-import type { HeroSlide, ProductGroup, Campus, About, Milestone } from './types';
+import type { HeroSlide, TrustItem, ProductsIntro, ProductGroup, Campus, About, Milestone } from './types';
 import heroXingxuan from '@/public/images/hero/xingxuan.jpg';
 import heroFeiwu from '@/public/images/hero/feiwu.jpg';
 import heroCampus from '@/public/images/hero/campus.jpg';
@@ -124,6 +124,21 @@ export const HERO_SLIDES: HeroSlide[] = [
 
 
 // 产品系列首页展示：三个主栏目，各 4 个系列（栏目规划原文）
+// 首屏和品牌片之间的信任条。每一句都来自首屏海报、校园公益、发展历程里已有的说法
+export const TRUST: TrustItem[] = [
+  { text: '南方航空官方推荐' },
+  { strong: '10W+', text: '带宠进客舱用户的选择' },
+  { text: '李念、海陆、罗予彤等明星同款' },
+  { strong: '800', text: '所高校校园公益' },
+  { strong: '2013', text: '年创立于厦门' },
+];
+
+// 产品区：三条产品线合成一块，右上角分页切换，自动轮换
+export const PRODUCTS_INTRO: ProductsIntro = {
+  title: '宠适产品',
+  lede: '从客舱到客厅，为带宠生活的每个场景设计',
+};
+
 export const PRODUCT_GROUPS: ProductGroup[] = [
   {
     id: 'air-carrier',
@@ -212,6 +227,10 @@ export const CAMPUS: Campus = {
     { text: '宠适之家校园公益获厦门市政府认可，公益广告登陆厦门、福州机场', href: '/#campus', label: '查看' },
     { text: '设立宠适之家校园公益基金，合作高校达 433 所', href: '/#campus', label: '查看' },
   ],
+  // 猫屋区块的标题和说明（说明取自上面 lede 里的实地数字）
+  housesTitle: '校园公益猫屋',
+  // 两个数字取自首屏公益海报（09-24 用户定只留这两句）
+  housesLede: '合作高校已达 800+ 所，捐助物资 9,000+ 件',
   // 猫屋卡：平时灰底棚拍（产品图 13–16 灰底版），悬停换成校园实景
   houses: [
     { name: '校园公益大猫屋', note: 'CHWE012010G1', studio: studioHouseL, image: sceneHouseL, alt: '校园草坪上的宠适大猫屋，猫从窗口探出' },
@@ -229,10 +248,10 @@ export const ABOUT: About = {
   cta: { href: '/#about', label: '了解品牌历程' },
   // 四格：中文标题 + 英文小注 + 子栏目；href 是整格的去向（子页做好后改这里）
   columns: [
-    { title: '品牌故事', en: 'Brand Story', href: '/#about', links: ['发展历程', '创始人', '团队风采', '企业荣誉', '品牌资质', '宣传片', '下载品牌手册'] },
+    { title: '品牌故事', en: 'Brand Story', href: '/brand-story', links: ['发展历程', '创始人', '团队风采', '企业荣誉', '品牌资质', '宣传片', '下载品牌手册'] },
     { title: '媒体报道', en: 'Media Coverage', href: '/#about', links: ['新闻报道'] },
     { title: '答疑解惑', en: 'FAQ', href: '/#about', links: ['常见问题'] },
-    { title: '联系我们', en: 'Contact', href: '/#about', links: ['客服渠道', '加入我们'] },
+    { title: '联系我们', en: 'Contact', href: '/#about', links: ['社媒一览', '客服渠道', '加入我们'] },
   ],
 };
 

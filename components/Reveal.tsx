@@ -12,6 +12,8 @@ export default function Reveal() {
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce || !('IntersectionObserver' in window)) return;
+    // 产品详情页不做入场动效（09-24 用户定），只有首页做
+    if (pathname.startsWith('/series')) return;
 
     const fold = window.innerHeight;
 
@@ -19,7 +21,8 @@ export default function Reveal() {
     // 不是整块；图片只淡入不位移。交错感来自各节点在页面上的高度不同、先后过线，不另加延时。
     // [data-reveal] 仍写在区块/卡片上当作范围，这里把范围里的叶子文字节点和图片分别挑出来观察；
     // 范围里什么都挑不出来时（纯装饰块），退回整块滑入。
-    const TEXT = 'h1,h2,h3,h4,p,li,dt,dd,blockquote,.tlink,.btn,.eyebrow,.capt,.small';
+    // 09-24 补：卡片英文小字(.en)、品牌片「全屏观看」
+    const TEXT = 'h1,h2,h3,h4,p,li,dt,dd,blockquote,.tlink,.btn,.eyebrow,.capt,.small,.en,.film-cta';
     const splitNodes = (scope: HTMLElement) => {
       const inOverlay = (n: Element) => n.closest('.overlay');
       // 本来就藏着、hover 才出现的（卡片悬停层、历程卡的说明文字）不归这里管

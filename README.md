@@ -17,19 +17,25 @@ npm run typecheck  # TypeScript 类型检查，构建时也会自动跑
 
 ```
 app/
-  layout.tsx       根布局：字体、书脊 + 抽屉菜单、页脚、入场动效
+  layout.tsx       根布局：字体、顶栏 + 抽屉菜单、页脚、入场动效
   page.tsx         首页：按栏目规划自上而下拼各区块
-  series/[slug]/   系列详情页
+  series/[slug]/   系列详情页（照 ruffwear 商品页：左图右信息卡、场景图组、详情/规格页签、其他产品推荐轮播）
+  products/        全部产品（分类切换，?cat=air-carrier|travel|home-living|houses）
+  brand-story/     品牌故事（发展历程、创始人、价值观、荣誉资质）
   globals.css      全站样式（设计变量在 :root）
 components/
-  SiteChrome.tsx   书脊（左侧竖条）+ 抽屉菜单        客户端组件
+  SiteChrome.tsx   顶栏（标语细条 + 吸顶菜单栏）+ 窄屏抽屉菜单   客户端组件
+  SearchPanel.tsx  站内搜索面板（索引在 content/search.ts，从各内容文件自动汇总）
   Reveal.tsx       滚动入场动效的观察者              客户端组件
   Footer.tsx       页脚
   LogoMark.tsx     P 形品牌标
-  home/            首页各区块；Hero、Reel、Ticker、CampusCarousel 是客户端组件，其余是服务端组件
+  home/            首页各区块；Hero、Reel、ProductTabs、Ticker、CampusCarousel 是客户端组件，其余是服务端组件
+                   （TrustStrip=首屏下信任条，ProductTabs=三条产品线合一的分页区，自动轮换）
 content/
   types.ts         全部内容数据的类型定义
   site.tsx         全站共用：导航、社媒、品牌片、公司信息
+  story.ts         品牌故事页内容（摘自资料准备里的历程、荣誉、资质表与董事长专访）
+  search.ts        站内搜索索引（从各内容文件自动汇总）
   home.ts          首页各区块的文案与图片
   series.ts        系列详情页数据
 ```
@@ -41,7 +47,7 @@ content/
 ## 约定
 
 - 色调、字体、整体版式以现有设计为准，调细节不改风格。设计变量集中在 `app/globals.css` 的 `:root`，
-  其中 `--rail`、`--gut`、`--pad-y` 在 1100px / 760px 两个断点里各有一份。
+  其中 `--nav-h`（菜单栏高）、`--gut`、`--pad-y` 在 1100px / 760px 两个断点里各有一份。
 - 字体经 `next/font` 在构建时下载并自托管，运行时不请求 Google Fonts。
 - 视频不进仓库，放 CDN；页面只引用地址。
 - URL 用英文。
@@ -55,6 +61,7 @@ content/
 - [x] M2.1 系列详情页首版、抽屉菜单改版
 - [x] M2.2 品牌片接入首页
 - [x] 迁移 TypeScript；手机紧凑版（手机保留电脑版构图，整体缩小）
+- [x] 09-24 改版：去掉白卡、大图铺满书脊以外的整屏，强调色换成品牌蓝绿 + 驼色，首屏下加信任条，三条产品线合成分页区（自动轮换）。随后取消左侧书脊改为顶栏（标语细条 + 吸顶菜单栏），首屏放大到第一屏底边正好是信任条。改版前的版本打了标签 `classic-2026-09-24`，对比或退回用 `git checkout classic-2026-09-24`
 - [ ] M3 关于我们各子页（历程 / 荣誉 / 资质 / 社媒 / 创始人）
 - [x] M4 基础：每页 metadata（描述、canonical、Open Graph）、Organization / WebSite / 面包屑 JSON-LD、sitemap、robots
 - [ ] M4 其余：Product / FAQPage / VideoObject 结构化数据（等产品资料、FAQ、宣传片上传日期）

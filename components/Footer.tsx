@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import BrandLockup from '@/components/BrandLockup';
-import { NAV_PRIMARY, COMPANY, SOCIAL_LINKS, LEGAL } from '@/content/site';
+import NavLink from '@/components/NavLink';
+import { TOPBAR_NAV, COMPANY, SOCIAL_LINKS, LEGAL } from '@/content/site';
 
-// 页脚（紧凑版）：字标 + 五栏目 / 公司信息 + 社媒图标 / 细线 + 版权·备案·隐私·条款。
+// 页脚（紧凑版）：字标 + 四栏目（同顶栏） / 公司信息（名称·地址·电话·邮箱）+ 社媒图标 / 细线 + 版权·备案·隐私·条款。
 // 不再是一个"联系我们"板块（书脊上没有它）；联系方式的正式入口在「关于我们」里。
 export default function Footer() {
   return (
@@ -10,15 +11,16 @@ export default function Footer() {
       <div className="foot-top">
         <Link className="foot-mark" href="/" aria-label="宠适 PETSFIT 首页"><BrandLockup /></Link>
         <nav className="foot-nav" aria-label="页脚导航">
-          {NAV_PRIMARY.map((item) => <Link key={item.title} href={item.href}>{item.title}</Link>)}
+          {/* 和顶栏同样四个栏目 */}
+          {TOPBAR_NAV.map((item) => <NavLink key={item.label} href={item.href}>{item.label}</NavLink>)}
         </nav>
       </div>
       <div className="foot-mid">
         <p className="foot-info">
           <span>{COMPANY.name}</span>
-          {COMPANY.address && <span>{COMPANY.address}</span>}
-          {COMPANY.phone && <span>{COMPANY.phone}</span>}
-          {COMPANY.email && <span>{COMPANY.email}</span>}
+          {COMPANY.address && <span>地址：{COMPANY.address}</span>}
+          {COMPANY.phone && <span>电话：{COMPANY.phone}</span>}
+          {COMPANY.email && <span>邮箱：{COMPANY.email}</span>}
         </p>
         <ul className="foot-icons" aria-label="社交媒体">
           {SOCIAL_LINKS.map((s) => (

@@ -5,11 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 import type { TouchEvent } from 'react';
 import usePrefersReducedMotion from '@/components/hooks/usePrefersReducedMotion';
 import type { CampusSlide } from '@/content/types';
-
-const COUNT_PAD = (n: number) => String(n).padStart(2, '0');
+import CarouselNav from '@/components/CarouselNav';
 
 // 校园公益海报轮播：1920×600 通宽，交叉淡入，7s 一张，手动操作后停止自动播放。
-// 文字是 HTML 压在图上；两侧 ‹ ›；右下页码 + 进度条。这一组只是展示，不做整张点击跳转。
+// 文字是 HTML 压在图上；翻页控件在底部居中（和首屏同一套）。这一组只是展示，不做整张点击跳转。
 export default function CampusCarousel({ slides }: { slides: CampusSlide[] }) {
   const reduce = usePrefersReducedMotion();
   const count = slides.length;
@@ -73,21 +72,8 @@ export default function CampusCarousel({ slides }: { slides: CampusSlide[] }) {
         );
       })}
 
-      <button className="cside is-prev" aria-label="上一张" onClick={() => manual((cur + count - 1) % count)}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5l-7 7 7 7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      </button>
-      <button className="cside is-next" aria-label="下一张" onClick={() => manual((cur + 1) % count)}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      </button>
-
-      <div className="cnav pcar-nav">
-        <span className="cnum"><b>{COUNT_PAD(cur + 1)}</b> / {COUNT_PAD(count)}</span>
-        <div className="cbars">
-          {slides.map((s, i) => (
-            <button key={s.id} className={`cbar${i === cur ? (autoOn ? ' is-on' : ' is-held') : ''}`} aria-label={`第 ${i + 1} 张`} onClick={() => manual(i)}><i></i></button>
-          ))}
-        </div>
-      </div>
+      {/* 翻页控件和首屏同一套：底部居中，上一张 /「1 / 3」/ 下一张 */}
+      <CarouselNav cur={cur} count={count} onPrev={() => manual((cur + count - 1) % count)} onNext={() => manual((cur + 1) % count)} />
     </div>
   );
 }
