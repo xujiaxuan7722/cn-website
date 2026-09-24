@@ -37,6 +37,7 @@
   --display:var(--font-hanken),var(--font-noto-sc),'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
 }
 
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
   background:var(--ground);
   color:var(--ink);
@@ -394,6 +395,7 @@ br.pc{display:inline}
   transition:clip-path .4s ease-out;
 }
 .reel.wipe{clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+.reel-tag{display:none}
 /* 静音循环时视频铺满整块（cover），上面压一层薄暗让白字看得清；全屏观看时去掉暗层、按比例显示 */
 .reel-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;cursor:pointer}
 .reel.is-watching .reel-video{cursor:default}
@@ -1131,4 +1133,186 @@ br.pc{display:inline}
   .strip-title{transition:none;transform:none}
   .rail::before,.rail-menu,.rail-label span,.rail-label em,.rail-mark svg{transition:none}
   .cart.is-active img{transition:none;transform:none}
+}
+
+/* ============================================================
+   手机紧凑版（09-23）：手机上保留电脑版的构图——首屏左文右图、产品一行四张、
+   关于我们成格排——整体缩小；字号不按比例硬缩，正文不小于 12px、小注不小于 11px。
+   只作用于 ≤760px，写在最后以覆盖上面各处的手机规则；电脑和平板不受影响。
+   ============================================================ */
+@media (max-width:760px){
+  /* 栏距 24px 在手机上太占地方，四张卡一行时每张只剩 68px；收到 10px */
+  :root{--pad-y:36px;--gut:14px;--colgap:10px}
+
+  /* ---- 首屏·手机：和电脑一样，海报铺满、文字缩小放在图片左侧 ----
+     首屏按 1.85:1 定高（比海报原比例 2.4:1 高一点，左侧空白被裁掉一些，右边的人和宠物完整露出）；
+     文字只占左边一半多一点，压在左侧淡色渐变上；每一行都不折。 */
+  .hero{--hero-w:calc(100vw - var(--rail) - var(--inset-r));min-height:calc(var(--hero-w) / 1.85);
+    padding:10px 0 10px;display:flex;flex-direction:column}
+  .cbg{inset:0}
+  /* 每张海报在手机上单独定位（content 里的 positionMobile），把人和宠物推到右半边 */
+  .cart.layout-left img{top:0 !important;height:100% !important;object-position:var(--pos-m,var(--pos,100% 50%))}
+  .cart.tone-light::after{background:linear-gradient(90deg,rgba(228,248,255,.97) 0%,rgba(228,248,255,.88) 42%,rgba(228,248,255,0) 66%)}
+  .cart.tone-dark::after{background:linear-gradient(90deg,rgba(31,90,110,.95) 0%,rgba(31,90,110,.82) 50%,rgba(31,90,110,0) 76%)}
+  .hero-top{min-height:22px;margin:0 calc(var(--gut) + var(--colgap)) 6px}
+  .wordmark .lockup{width:78px}
+  .habout{top:8px;right:8px;height:24px;padding:0 9px;gap:4px;font-size:10.5px;letter-spacing:.04em}
+  .habout svg{width:12px}
+  .cslides{flex:1;min-height:0}
+  .h-copy{grid-column:2 / 12;max-width:56%;gap:5px;padding-bottom:0}
+  .cslide.is-campus .h-copy{max-width:72%}
+  .h-title{font-size:16px;white-space:nowrap}
+  .h-title small{font-size:.62em}
+  .h-title.is-compact{font-size:13.5px}
+  .h-kicker{font-size:10.5px;margin-bottom:-3px}
+  .h-checks{gap:3px}
+  .h-checks li{font-size:10.5px;gap:5px;letter-spacing:0;white-space:nowrap}
+  .h-checks li small{display:none}
+  .h-lines{gap:2px}
+  .h-lines p{font-size:10.5px;white-space:nowrap}
+  .h-lines .is-strong{font-size:12.5px}
+  .h-lead{font-size:10.5px;margin-top:0;line-height:1.55;white-space:nowrap}
+  .h-lead b{font-size:1.3em;margin:0 .08em}
+  .h-stats{grid-template-columns:repeat(2,auto);justify-content:start;gap:4px 14px;margin-top:2px}
+  .h-stats li{gap:5px}
+  .h-stat-icon{display:block;width:14px;height:13px}
+  .h-stat-num b{font-size:12px}
+  .h-stat-num small{font-size:9px;margin-left:1px}
+  .h-stat-label{font-size:10px;letter-spacing:0;margin-top:0;opacity:.85}
+  .hero .cnav{margin-top:8px;min-height:0;gap:8px}
+  .cnum{font-size:10px;letter-spacing:.1em}
+  .cbar{width:20px;height:10px}
+  .cbars{gap:5px}
+  /* 左右箭头放在海报右下角，不压文字 */
+  .cside{width:24px;height:24px;top:auto;bottom:9px;transform:none}
+  .cside.is-prev{left:auto;right:36px}
+  .cside.is-next{right:8px}
+  .cside svg{width:13px;height:13px}
+
+  /* ---- 品牌片：手机上不自动播，左下角一行小字说明能点 ---- */
+  .reel{aspect-ratio:16 / 9}
+  .reel-tag{display:flex;position:absolute;left:12px;bottom:10px;z-index:2;align-items:center;gap:6px;
+    font-size:11px;letter-spacing:.08em;color:#fff;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+  .reel-tag svg{width:8px;height:10px}
+
+  /* ---- 栏目标题行：标题和「查看全部」回到同一行 ---- */
+  .series-block{padding-top:var(--pad-y);padding-bottom:var(--pad-y)}
+  /* 和下面伸出去的卡片网格同宽，左右对齐 */
+  .group-head{grid-column:1 / -1;margin-left:var(--gut);margin-right:var(--gut);flex-direction:row;align-items:baseline;gap:10px;padding-bottom:10px}
+  .tiles{grid-column:1 / -1;margin-left:var(--gut);margin-right:var(--gut)}
+  .group-head h2.display,.group-head .display{font-size:18px}
+  .group-head .tlink{font-size:12px;gap:6px}
+
+  /* ---- 系列卡：一行四张 ---- */
+  /* 卡片只有七十多像素宽：名字 11px、型号 10px 灰字，各占一行不折；极端情况下省略号兜底 */
+  /* 卡片网格左右伸进页边栏距，四张卡各多出 5px */
+  .work.four,.series-block .work.four{grid-column:1 / -1;margin-left:var(--gut);margin-right:var(--gut);grid-template-columns:repeat(4,minmax(0,1fr));column-gap:6px;row-gap:18px;margin-top:14px}
+  .work.four a{gap:7px}
+  .work.four .capt{gap:2px;min-width:0}
+  .work.four .title,.work.four .client{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0}
+  /* 430 屏上 11/10px；更窄的手机按屏宽小半号，最小 10/9px */
+  /* 手机系统字体（鸿蒙、OPPO Sans 等）比思源黑体宽一些，留出余量：430 屏上 10.5/9.5px */
+  .work.four .title{font-size:clamp(9.5px,2.44vw,10.5px);font-weight:500;line-height:1.4}
+  .work.four .client{font-size:clamp(8.5px,2.2vw,9.5px);line-height:1.4}
+
+  /* ---- 查看全部产品线 ---- */
+  .slab.center{padding:28px 0}
+  .center .inner{gap:14px}
+  .center .display{font-size:18px}
+  .btn{font-size:13px;padding:9px 16px;gap:8px}
+
+  /* ---- 校园公益：海报轮播接近原比例，新闻条收小 ---- */
+  .pcar{aspect-ratio:2 / 1}
+  .p-kicker{font-size:11px}
+  .p-title,.layout-left .p-title,.layout-center .p-title{font-size:16px}
+  .p-sub,.layout-left .p-sub,.layout-center .p-sub{font-size:11px}
+  /* 大赛那张标题 16 个字，一行放下要小一号；副题字距保留电脑版的疏朗 */
+  .layout-left .p-title{font-size:13.5px;letter-spacing:.03em}
+  .layout-left .p-sub{letter-spacing:.14em;margin-top:.5em}
+  .layout-left .pcopy{max-width:62%}
+  .pcar-nav{bottom:6px}
+  .pcar-nav .cbar{width:22px}
+  /* 公告条一行：文字放不下就省略号，「查看」固定在右边同一行，点进去看全文 */
+  .band{padding:11px 0}
+  /* 网格列限制在横幅宽度内（默认会被一整行不折的长文字撑宽，把「查看」挤出横幅） */
+  .ticker{min-height:1.6em;grid-template-columns:minmax(0,1fr)}
+  .tick{min-width:0;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:12px}
+  .tick p{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px;line-height:1.6}
+  .band .tlink{flex:none;font-size:11.5px;gap:5px}
+  .band .tlink .arrow{transform:scale(.8)}
+
+  /* ---- 关于我们：两列四格 ---- */
+  .slab.about-block{padding:36px 0}
+  .tiles{grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}
+  .tile{padding:14px 12px;gap:8px;min-height:0}
+  .tile-head h3{font-size:15px}
+  .tile-head .en{font-size:11px;margin-top:2px;letter-spacing:.06em}
+  .tile ul{gap:2px;font-size:12px;line-height:1.6}
+
+  /* ---- 页脚 ---- */
+  .foot{padding:26px 0 20px}
+  .foot-top{flex-direction:row;flex-wrap:wrap;align-items:center;gap:12px}
+  .foot-mark .lockup{width:110px}
+  .foot-nav{gap:6px 14px}
+  .foot-nav a{font-size:12px}
+  .foot-mid{flex-direction:row;align-items:center;gap:10px;margin-top:16px}
+  .foot-info{font-size:11px}
+  .foot-icons{gap:12px}
+  .foot-icons svg{width:18px;height:18px}
+  .foot-rule{margin:16px 0 10px}
+  .foot-legal{gap:4px 14px;font-size:11px}
+
+  /* ---- 抽屉菜单：不再铺满整屏，宽约四分之三屏，右边露出被压暗的页面，一眼知道是浮层 ---- */
+  .drawer{width:min(248px,66vw);transform:translateX(-110%);
+    padding:calc(env(safe-area-inset-top,0px) + 60px) 18px calc(env(safe-area-inset-bottom,0px) + 22px) 18px;gap:24px}
+  .drawer.open{transform:translateX(0)}
+  .backdrop.on{background:rgba(0,0,0,.32)}
+  .nav-primary{gap:0}
+  .nav-item{padding:13px 0}
+  .nav-item h2{font-size:16px;letter-spacing:.05em}
+  .nav-item p{font-size:11px;margin-top:3px}
+  .nav-item .arrow{width:22px;height:11px}
+  .nav-foot{gap:12px}
+  .nav-secondary{gap:8px 14px;padding-top:14px}
+  .nav-secondary a{font-size:12px}
+  .nav-copy{font-size:11px;letter-spacing:.02em}
+
+  /* ---- 顶部按钮 ---- */
+  .totop{width:40px;height:40px;right:10px;font-size:11px;gap:2px}
+  .totop svg{width:18px;height:8px}
+
+  /* ---- 系列详情页 ---- */
+  .crumbs{font-size:11px;margin-bottom:12px;gap:6px}
+  .sp-a-copy{padding:28px 0 20px}
+  .sp-title{font-size:26px}
+  .sp-title small{font-size:12px}
+  .sp-tagline{font-size:14px;margin-top:8px}
+  .sp-points{margin-top:14px}
+  .sp-points li{font-size:12px}
+  .sp-list{grid-column:1 / -1;margin-left:var(--gut);margin-right:var(--gut);grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:14px}
+  .sp-list li{gap:6px}
+  .sp-list .capt{min-width:0}
+  .sp-list .title,.sp-list .client{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0}
+  .sp-list .title{font-size:clamp(10px,2.56vw,11px)}
+  .sp-list .client{font-size:clamp(9px,2.33vw,10px)}
+  .sp-empty{font-size:10px;margin:4px;letter-spacing:0;text-align:center;white-space:nowrap}
+  .slab.sp-specs{padding:36px 0}
+  .sp-h2{font-size:18px}
+  .sp-specs .c-aside{margin-top:12px}
+  .sp-dl > div{grid-template-columns:6em 1fr;gap:12px;padding:9px 0;font-size:13px}
+  .sp-switch{left:calc(var(--rail) + 8px);bottom:64px}
+  .sp-switch a{width:30px;height:30px;font-size:12px}
+}
+/* 手机紧凑版·小屏（≤380px，如 iPhone SE）：标题行放不下「查看××全部产品」，
+   标题不许折行，链接和首屏卖点再收一号 */
+@media (max-width:380px){
+  .group-head h2.display,.group-head .display{font-size:16px;white-space:nowrap}
+  .group-head .tlink{font-size:11px;gap:4px;white-space:nowrap}
+  .group-head .tlink .arrow{display:none}
+  .h-copy{max-width:60%}
+  .h-checks li,.h-lines p,.h-lead{font-size:10px}
+  .h-title{font-size:15px}
+  .h-title.is-compact{font-size:12.5px}
+  /* 卡片名和型号差一两像素放不下，字距收一点 */
+  .work.four .title,.work.four .client{letter-spacing:-.04em}
 }

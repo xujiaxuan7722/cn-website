@@ -20,11 +20,11 @@ export default function Reveal() {
     // [data-reveal] 仍写在区块/卡片上当作范围，这里把范围里的叶子文字节点和图片分别挑出来观察；
     // 范围里什么都挑不出来时（纯装饰块），退回整块滑入。
     const TEXT = 'h1,h2,h3,h4,p,li,dt,dd,blockquote,.tlink,.btn,.eyebrow,.capt,.small';
-    const splitNodes = (scope) => {
-      const inOverlay = (n) => n.closest('.overlay');
+    const splitNodes = (scope: HTMLElement) => {
+      const inOverlay = (n: Element) => n.closest('.overlay');
       // 本来就藏着、hover 才出现的（卡片悬停层、历程卡的说明文字）不归这里管
-      const designHidden = (n) => getComputedStyle(n).opacity === '0';
-      let texts = [...scope.querySelectorAll(TEXT)].filter((n) => !n.querySelector(TEXT) && !inOverlay(n) && !designHidden(n));
+      const designHidden = (n: Element) => getComputedStyle(n).opacity === '0';
+      let texts = [...scope.querySelectorAll<HTMLElement>(TEXT)].filter((n) => !n.querySelector(TEXT) && !inOverlay(n) && !designHidden(n));
       if (!texts.length && scope.matches(TEXT)) texts = [scope];
       const imgs = [...scope.querySelectorAll('img, svg.lockup, .shot > svg')].filter((n) => !inOverlay(n));
       return { texts, imgs };
@@ -33,10 +33,10 @@ export default function Reveal() {
     // union.co 的入场是可重复的：节点滚出视口就复位，再滚回来再滑一次。
     // 两个观察者：一个带 -12% 边距负责"进来了→显示"，另一个不带边距负责"整个出去了→复位"，
     // 复位只在完全离开视口后做，人正看着的字不会在屏幕边上淡掉。
-    const watch = (selector, cls, options) => {
-      const below = (el) => el.getBoundingClientRect().top > fold - 40;
-      const nodes = [];
-      document.querySelectorAll(selector).forEach((scope) => {
+    const watch = (selector: string, cls: string, options: IntersectionObserverInit) => {
+      const below = (el: Element) => el.getBoundingClientRect().top > fold - 40;
+      const nodes: Element[] = [];
+      document.querySelectorAll<HTMLElement>(selector).forEach((scope) => {
         const { texts, imgs } = splitNodes(scope);
         if (!texts.length && !imgs.length) {
           nodes.push(scope);
@@ -83,7 +83,7 @@ export default function Reveal() {
 // 擦入动效用 clip-path 把元素裁成零高度，被完全裁掉的元素在 IntersectionObserver 眼里
 // 永远"不相交"，观察者等不到它（原型里品牌片因此一直不出现）。
 // 所以这里按元素盒子的位置判断：getBoundingClientRect 不受 clip-path 影响。
-function watchWipe(selector, fold) {
+function watchWipe(selector: string, fold: number): () => void {
   let parked = [...document.querySelectorAll(selector)].filter(
     (el) => el.getBoundingClientRect().top > fold - 40,
   );

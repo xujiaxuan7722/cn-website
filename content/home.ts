@@ -1,5 +1,6 @@
 // 首页内容。文字只取自已有材料：首屏海报设计内容（pptx）、发展历程、栏目规划。
 // 材料里没有的（系列介绍、产品卖点）留空，等文案补齐，不自己编。
+import type { HeroSlide, ProductGroup, Campus, About, Milestone } from './types';
 import heroXingxuan from '@/public/images/hero/xingxuan.jpg';
 import heroFeiwu from '@/public/images/hero/feiwu.jpg';
 import heroCampus from '@/public/images/hero/campus.jpg';
@@ -46,7 +47,7 @@ import studioHouseC from '@/public/images/series/house-classic-studio.jpg';
 // position / positionMobile = 图片铺满时保留哪一段（桌面左文右图，手机上文下图，要露出的部分不一样）
 // wordmark = 这一张左上角带不带 PETSFIT 字标（带字标的两张，文案相应往下让一点）
 // layout = 'left' 文案在左；'top' 标题压在图片自带的顶部横条上（五联拼图不能裁，按原比例整张放）
-export const HERO_SLIDES = [
+export const HERO_SLIDES: HeroSlide[] = [
   {
     id: 'xingxuan',
     wordmark: true,
@@ -123,7 +124,7 @@ export const HERO_SLIDES = [
 
 
 // 产品系列首页展示：三个主栏目，各 4 个系列（栏目规划原文）
-export const PRODUCT_GROUPS = [
+export const PRODUCT_GROUPS: ProductGroup[] = [
   {
     id: 'air-carrier',
     label: '宠适航空包',
@@ -165,7 +166,7 @@ export const PRODUCT_GROUPS = [
 ];
 
 // 校园公益
-export const CAMPUS = {
+export const CAMPUS: Campus = {
   // 顶部海报轮播（1920×600，三张顺序：星火计划 → 创新大赛 → 毕业生礼包）。文字都是 HTML 压在图上；
   // layout = 文案在图上的位置：top（顶部居中）/ left（左侧垂直居中）/ center（中部偏左）
   slides: [
@@ -221,7 +222,7 @@ export const CAMPUS = {
 };
 
 // 关于我们（其他信息栏目）
-export const ABOUT = {
+export const ABOUT: About = {
   eyebrow: '关于我们',
   title: ['让宠物更舒服，', '让生活更舒心'],
   lede: '吉信德 2001 年成立于厦门，2013 年创立宠适 PETSFIT 品牌，集宠物用品开发设计、智能制造与品牌销售于一体。',
@@ -236,7 +237,7 @@ export const ABOUT = {
 };
 
 // 品牌历程（取自发展历程表）
-export const MILESTONES = [
+export const MILESTONES: Milestone[] = [
   { year: '2025', title: '启动保证登机计划', text: '开发航空软包系列，与西部航空、南方航空合作，宠适航空包成为航司推荐产品。' },
   { year: '2024', title: '宠适之家校园公益启动', text: '致力持续为全国 2000 所大学校园的小流浪提供救助物资。' },
   { year: '2013', title: '宠适品牌诞生', text: '成立厦门吉信德电子商务公司，创立宠适 PETSFIT 自主品牌。' },

@@ -2,32 +2,34 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties, MouseEvent, ReactNode, TouchEvent } from 'react';
 import Image from 'next/image';
 import BrandLockup from '@/components/BrandLockup';
 import usePrefersReducedMotion from '@/components/hooks/usePrefersReducedMotion';
 import { HERO_SLIDES } from '@/content/home';
+import type { StatIconName } from '@/content/types';
 
 const SLIDES = HERO_SLIDES;
 
 const COUNT = SLIDES.length;
-const pad = (n) => String(n).padStart(2, '0');
+const pad = (n: number) => String(n).padStart(2, '0');
 
 // 1 · 首屏轮播：7s 一张，任一次手动操作后永久停止自动播放。
 // 每一张的文字都在服务端输出到 HTML 里，浏览器里只切换 class。
 export default function Hero() {
   const reduce = usePrefersReducedMotion();
   const [cur, setCur] = useState(0);
-  const [prev, setPrev] = useState(null);
+  const [prev, setPrev] = useState<number | null>(null);
   const [userStopped, setUserStopped] = useState(false);
   const [paused, setPaused] = useState(false);
-  const touchX = useRef(null);
+  const touchX = useRef<number | null>(null);
   const autoOn = !reduce && !userStopped;
 
-  const paint = (n) => {
+  const paint = (n: number) => {
     setPrev(cur);
     setCur(n);
   };
-  const manual = (n) => {
+  const manual = (n: number) => {
     setUserStopped(true);
     paint(n);
   };
@@ -47,7 +49,7 @@ export default function Hero() {
     return () => clearTimeout(t);
   }, [prev]);
 
-  const onTouchEnd = (e) => {
+  const onTouchEnd = (e: TouchEvent<HTMLElement>) => {
     if (touchX.current === null) return;
     const dx = e.changedTouches[0].clientX - touchX.current;
     touchX.current = null;
@@ -57,7 +59,7 @@ export default function Hero() {
 
   // 地址栏里已经是同一个锚点时（比如刚点过一次、或带着 #air-carrier 刷新），再点浏览器不会再滚——
   // 目标就在本页的话自己滚过去，并把地址同步上；目标不在本页（以后有了独立页面）才交给 Link 正常跳转
-  const goSection = (e, href) => {
+  const goSection = (e: MouseEvent<HTMLAnchorElement>, href: string) => {
     const id = href.split('#')[1];
     const target = id && document.getElementById(id);
     if (!target) return;
@@ -113,7 +115,8 @@ export default function Hero() {
               key={s.id}
               data-i={i}
               className={`cart is-img tone-${s.tone} layout-${s.layout}${state}`}
-              style={s.position && { '--pos': s.position, '--pos-m': s.positionMobile }}
+              // CSS 自定义属性不在 CSSProperties 的字段里，需要断言一下
+              style={s.position ? ({ '--pos': s.position, '--pos-m': s.positionMobile } as CSSProperties) : undefined}
             >
               {s.layout === 'top' ? (
                 // 标题放在图片容器里，跟着图片一起缩放，才能一直压在拼图自带的顶部横条上
@@ -122,7 +125,7 @@ export default function Hero() {
                   <div className="strip-title">
                     <h2 className="h-title">
                       {s.title}
-                      {s.tags.map((t) => <small key={t}>{t}</small>)}
+                      {s.tags?.map((t) => <small key={t}>{t}</small>)}
                     </h2>
                   </div>
                 </div>
@@ -251,7 +254,7 @@ export default function Hero() {
   );
 }
 
-function Chevron({ dir }) {
+function Chevron({ dir }: { dir: 'left' | 'right' }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d={dir === 'left' ? 'M14.5 5l-7 7 7 7' : 'M9.5 5l7 7-7 7'} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -268,7 +271,7 @@ function CheckIcon() {
   );
 }
 
-const STAT_ICONS = {
+const STAT_ICONS: Record<StatIconName, ReactNode> = {
   // 教学楼
   campus: <path d="M24 5l15 8v3h-3v17h4v4H8v-4h4V16H9v-3zM16 19v14h5v-8h6v8h5V19zM22 11h4v4h-4z" />,
   // 爪印
@@ -287,7 +290,7 @@ const STAT_ICONS = {
   supplies: <path d="M24 5l16 7v20l-16 8-16-8V12zm0 5l-9 4 9 4 9-4zM12 17v12l10 5V22zm24 0l-10 5v12l10-5z" />,
 };
 
-function StatIcon({ name }) {
+function StatIcon({ name }: { name: StatIconName }) {
   return (
     <svg className="h-stat-icon" viewBox="0 0 48 44" fill="currentColor" aria-hidden="true">
       {STAT_ICONS[name]}

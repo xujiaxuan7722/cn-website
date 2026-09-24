@@ -2,24 +2,26 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import type { TouchEvent } from 'react';
 import usePrefersReducedMotion from '@/components/hooks/usePrefersReducedMotion';
+import type { CampusSlide } from '@/content/types';
 
-const COUNT_PAD = (n) => String(n).padStart(2, '0');
+const COUNT_PAD = (n: number) => String(n).padStart(2, '0');
 
 // 校园公益海报轮播：1920×600 通宽，交叉淡入，7s 一张，手动操作后停止自动播放。
 // 文字是 HTML 压在图上；两侧 ‹ ›；右下页码 + 进度条。这一组只是展示，不做整张点击跳转。
-export default function CampusCarousel({ slides }) {
+export default function CampusCarousel({ slides }: { slides: CampusSlide[] }) {
   const reduce = usePrefersReducedMotion();
   const count = slides.length;
   const [cur, setCur] = useState(0);
-  const [prev, setPrev] = useState(null);
+  const [prev, setPrev] = useState<number | null>(null);
   const [stopped, setStopped] = useState(false);
   const [paused, setPaused] = useState(false);
-  const touchX = useRef(null);
+  const touchX = useRef<number | null>(null);
   const autoOn = !reduce && !stopped;
 
-  const paint = (n) => { setPrev(cur); setCur(n); };
-  const manual = (n) => { setStopped(true); paint(n); };
+  const paint = (n: number) => { setPrev(cur); setCur(n); };
+  const manual = (n: number) => { setStopped(true); paint(n); };
 
   useEffect(() => {
     if (!autoOn || paused) return;
@@ -33,7 +35,7 @@ export default function CampusCarousel({ slides }) {
     return () => clearTimeout(t);
   }, [prev]);
 
-  const onTouchEnd = (e) => {
+  const onTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
     if (touchX.current === null) return;
     const dx = e.changedTouches[0].clientX - touchX.current;
     touchX.current = null;

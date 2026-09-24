@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -8,7 +9,7 @@ export function generateStaticParams() {
   return SERIES.map((s) => ({ slug: s.slug }));
 }
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params }: PageProps<'/series/[slug]'>): Promise<Metadata> {
   const { slug } = await params;
   const s = findSeries(slug);
   return { title: s ? `${s.name} · ${s.group.label} · 宠适` : '宠适' };
@@ -16,12 +17,12 @@ export async function generateMetadata({ params }) {
 
 // 系列详情页。三种头图排版用 ?layout=a|b|c 切换（试排版用，定稿后只留一种）：
 // a 左文右图（同首屏几何） / b 通幅大图，标题压在图上（同校园公益海报） / c 图居中、文在下（以产品为主的系列）
-export default async function SeriesPage({ params, searchParams }) {
+export default async function SeriesPage({ params, searchParams }: PageProps<'/series/[slug]'>) {
   const { slug } = await params;
-  const { layout = 'a' } = await searchParams;
+  const { layout } = await searchParams;
   const s = findSeries(slug);
   if (!s) notFound();
-  const L = ['a', 'b', 'c'].includes(layout) ? layout : 'a';
+  const L = layout === 'b' || layout === 'c' ? layout : 'a';
 
   const crumbs = (
     <nav className="crumbs" aria-label="位置">
@@ -101,7 +102,7 @@ export default async function SeriesPage({ params, searchParams }) {
           <div><h2 className="display">{s.group.label}其他系列</h2></div>
           <Link className="tlink" href={`/#${s.group.id}`}>返回{s.group.label}<i className="arrow sm" aria-hidden="true"></i></Link>
         </div>
-        <SeriesGrid items={s.siblings} hrefBase="/series/" label={s.group.label} />
+        <SeriesGrid items={s.siblings} href={`/#${s.group.id}`} hrefBase="/series/" label={s.group.label} />
       </section>
 
       {/* 排版切换，试排版期间用 */}

@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import usePrefersReducedMotion from '@/components/hooks/usePrefersReducedMotion';
+import type { NewsItem } from '@/content/types';
 
 // 公告条文字轮播：4s 一条，纵向翻动
-export default function Ticker({ items }) {
+export default function Ticker({ items }: { items: NewsItem[] }) {
   const reduce = usePrefersReducedMotion();
   const [on, setOn] = useState(0);
-  const [out, setOut] = useState(null);
+  const [out, setOut] = useState<number | null>(null);
 
   useEffect(() => {
     if (reduce || items.length < 2) return;

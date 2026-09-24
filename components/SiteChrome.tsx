@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import type { MouseEvent } from 'react';
 import { usePathname } from 'next/navigation';
 import LogoMark from '@/components/LogoMark';
 import { NAV_PRIMARY, NAV_SECONDARY, RAIL_EN, COMPANY } from '@/content/site';
@@ -15,15 +16,15 @@ export default function SiteChrome() {
   const [label, setLabel] = useState('品牌');
   const [swapping, setSwapping] = useState(false);
 
-  const menuBtn = useRef(null);
-  const drawer = useRef(null);
+  const menuBtn = useRef<HTMLButtonElement>(null);
+  const drawer = useRef<HTMLElement>(null);
   const touched = useRef(false);
 
   // 记下最近一次操作用的是键盘还是鼠标/触屏，样式据此决定要不要画焦点框
   useEffect(() => {
     const root = document.documentElement;
     const onPointer = () => { root.dataset.input = 'pointer'; };
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       root.dataset.input = 'keyboard';
     };
@@ -43,12 +44,12 @@ export default function SiteChrome() {
 
   // 书脊标签跟着滚动换字
   useEffect(() => {
-    const sections = [...document.querySelectorAll('[data-label]')];
-    let current = null;
-    let swapTimer = null;
+    const sections = [...document.querySelectorAll<HTMLElement>('[data-label]')];
+    let current: string | null = null;
+    let swapTimer: ReturnType<typeof setTimeout> | undefined;
     let ticking = false;
 
-    const swapTo = (text) => {
+    const swapTo = (text: string) => {
       if (text === current) return;
       const first = current === null;
       current = text;
@@ -63,16 +64,17 @@ export default function SiteChrome() {
 
     const update = () => {
       const mid = window.innerHeight * 0.45;
-      let best = null;
+      let best: HTMLElement | null = null;
       let bestDist = Infinity;
-      sections.forEach((s) => {
+      for (const s of sections) {
         const r = s.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > window.innerHeight) return;
+        if (r.bottom < 0 || r.top > window.innerHeight) continue;
         let dist = r.top > mid ? r.top - mid : 0;
         if (r.top <= mid && r.bottom >= mid) dist = -1;
         if (dist < bestDist) { bestDist = dist; best = s; }
-      });
-      if (best) swapTo(best.getAttribute('data-label'));
+      }
+      const text = best?.dataset.label;
+      if (text) swapTo(text);
       ticking = false;
     };
 
@@ -94,7 +96,7 @@ export default function SiteChrome() {
   useEffect(() => {
     document.documentElement.classList.toggle('nav-open', open);
     if (!open) return;
-    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
@@ -109,14 +111,14 @@ export default function SiteChrome() {
     else menuBtn.current?.focus();
   }, [open]);
 
-  const toggle = (next) => {
+  const toggle = (next: boolean) => {
     touched.current = true;
     setOpen(next);
   };
 
   // 抽屉里的链接点完就关，锚点跳转才看得见
-  const onDrawerClick = (e) => {
-    if (e.target.closest('a')) setTimeout(() => toggle(false), 60);
+  const onDrawerClick = (e: MouseEvent<HTMLElement>) => {
+    if ((e.target as Element).closest('a')) setTimeout(() => toggle(false), 60);
   };
 
   return (

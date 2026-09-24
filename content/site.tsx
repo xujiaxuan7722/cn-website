@@ -1,7 +1,9 @@
 // 全站共用的内容：导航、社媒。来源：宠适网站栏目规划 20260708、社媒一览。
 // 子页面还没做之前，导航先落到首页对应区块；做出来之后只改这里的 href。
 
-export const NAV_PRIMARY = [
+import type { NavPrimaryItem, LinkItem, SocialAccount, SocialLink, BrandFilm, Company, Legal } from './types';
+
+export const NAV_PRIMARY: NavPrimaryItem[] = [
   { href: '/#air-carrier', title: '宠适航空包', desc: '星选 · 飞屋 · 乘风 · 云游' },
   { href: '/#travel', title: '带宠出行', desc: '美拉德 · 学院π · 牛仔 · 车载沙发' },
   { href: '/#home-living', title: '宠物家居', desc: '软窝 · 猫窗台 · 猫柜 · 猫砂' },
@@ -9,13 +11,13 @@ export const NAV_PRIMARY = [
   { href: '/#about', title: '关于我们', desc: '品牌故事 · 媒体报道 · 答疑 · 联系' },
 ];
 
-export const NAV_SECONDARY = [
+export const NAV_SECONDARY: LinkItem[] = [
   { href: '/#about', label: '品牌历程' },
   { href: '/#about', label: '社媒一览' },
   { href: '/#about', label: '加入我们' },
 ];
 
-export const SOCIAL = [
+export const SOCIAL: SocialAccount[] = [
   { name: '宠适 PETSFIT 品牌官号', where: '小红书 / 抖音', handle: '@宠适PETSFIT' },
   { name: '宠适航空包官方号', where: '视频号 / 抖音 / 小红书', handle: '@宠适航空包' },
   { name: '宠适之家校园公益', where: '小红书 / 抖音 / 快手', handle: '@宠适之家校园公益' },
@@ -24,7 +26,7 @@ export const SOCIAL = [
 ];
 
 // 书脊标签的英文小注，键是各区块的 data-label
-export const RAIL_EN = {
+export const RAIL_EN: Record<string, string> = {
   品牌: 'Brand',
   宠适航空包: 'Air Carrier',
   带宠出行: 'Travel',
@@ -37,7 +39,7 @@ export const RAIL_EN = {
 };
 
 // 品牌片。src 现在指向本地 1080p 压缩版（不入库，见 .gitignore *.mp4）；上线时换成 CDN 地址即可
-export const BRAND_FILM = {
+export const BRAND_FILM: BrandFilm = {
   title: '吉信德 SUNNYPET 宣传片 2024',
   src: '/videos/brand-film-1080p.mp4',
   duration: '3′17″',
@@ -45,18 +47,18 @@ export const BRAND_FILM = {
 };
 
 // 页脚用的公司信息与法务。地址 / 电话 / 邮箱 / 备案号材料里没有，空着的不显示；备案号上线前必须填
-export const COMPANY = {
+export const COMPANY: Company = {
   name: '厦门吉信德电子商务有限公司',
   address: '',
   phone: '',
   email: '',
 };
-export const LEGAL = {
+export const LEGAL: Legal = {
   icp: '闽ICP备XXXXXXXX号',     // 占位，待导师给
   police: '',                  // 公安联网备案号，有再填
 };
 // 页脚社媒图标：href 待补主页链接；图标是单色线描，跟随文字色
-export const SOCIAL_LINKS = [
+export const SOCIAL_LINKS: SocialLink[] = [
   { name: '小红书', href: '#', icon: <><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" strokeWidth="1.6" /><path d="M7 15l2-6 2 4 2-4 2 6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></> },
   { name: '抖音', href: '#', icon: <><path d="M14 4v9.5a3.5 3.5 0 1 1-3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /><path d="M14 4c.6 2.4 2.2 3.8 4.5 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></> },
   { name: '视频号', href: '#', icon: <><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.6" /><path d="M10 9l5 3-5 3z" fill="currentColor" /></> },

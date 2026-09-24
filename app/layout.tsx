@@ -1,3 +1,5 @@
+import type { Metadata, Viewport } from 'next';
+import type { ReactNode } from 'react';
 import { Hanken_Grotesk, Noto_Sans_SC } from 'next/font/google';
 import SiteChrome from '@/components/SiteChrome';
 import Reveal from '@/components/Reveal';
@@ -20,17 +22,17 @@ const notoSansSC = Noto_Sans_SC({
   preload: false,
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: '宠适',
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="zh-CN"
